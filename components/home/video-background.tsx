@@ -12,7 +12,6 @@ export function VideoBackground({
       <video
         autoPlay
         loop
-        playsInline
         src={videoUrl}
         className="absolute inset-0 h-full w-full object-cover"
       />
