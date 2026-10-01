@@ -37,50 +37,57 @@ export function HomeView() {
 
     const tryPlayWithSound = () => {
       video.muted = false
+      video.volume = 1.0
       const promise = video.play()
       if (promise !== undefined) {
-        promise
-          .then(() => {
-            setIsVideoMuted(false)
-          })
-          .catch(() => {
-            video.muted = true
-            video.play().catch(() => {})
-            setIsVideoMuted(true)
-          })
+        promise.catch(() => {
+          video.muted = true
+          video.play().catch(() => {})
+        })
       }
     }
 
     tryPlayWithSound()
 
-    const enableAudio = () => {
+    const activateSound = () => {
       if (videoRef.current) {
         videoRef.current.muted = false
         videoRef.current.volume = 1.0
         videoRef.current.play().catch(() => {})
-        setIsVideoMuted(false)
       }
-      window.removeEventListener("pointerdown", enableAudio)
-      window.removeEventListener("click", enableAudio)
-      window.removeEventListener("scroll", enableAudio)
-      window.removeEventListener("touchstart", enableAudio)
-      window.removeEventListener("keydown", enableAudio)
+      window.removeEventListener("pointermove", activateSound)
+      window.removeEventListener("mousemove", activateSound)
+      window.removeEventListener("pointerdown", activateSound)
+      window.removeEventListener("click", activateSound)
+      window.removeEventListener("scroll", activateSound)
+      window.removeEventListener("wheel", activateSound)
+      window.removeEventListener("touchstart", activateSound)
+      window.removeEventListener("keydown", activateSound)
+      window.removeEventListener("focus", activateSound)
     }
 
-    window.addEventListener("pointerdown", enableAudio, { once: true })
-    window.addEventListener("click", enableAudio, { once: true })
-    window.addEventListener("scroll", enableAudio, { once: true })
-    window.addEventListener("touchstart", enableAudio, { once: true })
-    window.addEventListener("keydown", enableAudio, { once: true })
+    window.addEventListener("pointermove", activateSound, { once: true })
+    window.addEventListener("mousemove", activateSound, { once: true })
+    window.addEventListener("pointerdown", activateSound, { once: true })
+    window.addEventListener("click", activateSound, { once: true })
+    window.addEventListener("scroll", activateSound, { once: true })
+    window.addEventListener("wheel", activateSound, { once: true })
+    window.addEventListener("touchstart", activateSound, { once: true })
+    window.addEventListener("keydown", activateSound, { once: true })
+    window.addEventListener("focus", activateSound, { once: true })
 
     video.addEventListener("canplay", tryPlayWithSound, { once: true })
 
     return () => {
-      window.removeEventListener("pointerdown", enableAudio)
-      window.removeEventListener("click", enableAudio)
-      window.removeEventListener("scroll", enableAudio)
-      window.removeEventListener("touchstart", enableAudio)
-      window.removeEventListener("keydown", enableAudio)
+      window.removeEventListener("pointermove", activateSound)
+      window.removeEventListener("mousemove", activateSound)
+      window.removeEventListener("pointerdown", activateSound)
+      window.removeEventListener("click", activateSound)
+      window.removeEventListener("scroll", activateSound)
+      window.removeEventListener("wheel", activateSound)
+      window.removeEventListener("touchstart", activateSound)
+      window.removeEventListener("keydown", activateSound)
+      window.removeEventListener("focus", activateSound)
       video.removeEventListener("canplay", tryPlayWithSound)
     }
   }, [])
