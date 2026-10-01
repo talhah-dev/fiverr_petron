@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState } from "react"
 import { VideoBackground } from "./video-background"
 import { HeroHeader } from "./hero-header"
 import { MediaCatalog } from "./media-catalog"
@@ -23,138 +23,13 @@ export function HomeView() {
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false)
   const [activeItem, setActiveItem] = useState<MediaItem | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [isVideoMuted, setIsVideoMuted] = useState(false)
-
-  const videoRef = useRef<HTMLVideoElement | null>(null)
-  const audioCtxRef = useRef<AudioContext | null>(null)
-  const oscRef = useRef<OscillatorNode | null>(null)
-
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    video.volume = 1.0
-
-    const tryPlayWithSound = () => {
-      video.muted = false
-      video.volume = 1.0
-      const promise = video.play()
-      if (promise !== undefined) {
-        promise.catch(() => {
-          video.muted = true
-          video.play().catch(() => {})
-        })
-      }
-    }
-
-    tryPlayWithSound()
-
-    const activateSound = () => {
-      if (videoRef.current) {
-        videoRef.current.muted = false
-        videoRef.current.volume = 1.0
-        videoRef.current.play().catch(() => {})
-      }
-      window.removeEventListener("pointermove", activateSound)
-      window.removeEventListener("mousemove", activateSound)
-      window.removeEventListener("pointerdown", activateSound)
-      window.removeEventListener("click", activateSound)
-      window.removeEventListener("scroll", activateSound)
-      window.removeEventListener("wheel", activateSound)
-      window.removeEventListener("touchstart", activateSound)
-      window.removeEventListener("keydown", activateSound)
-      window.removeEventListener("focus", activateSound)
-    }
-
-    window.addEventListener("pointermove", activateSound, { once: true })
-    window.addEventListener("mousemove", activateSound, { once: true })
-    window.addEventListener("pointerdown", activateSound, { once: true })
-    window.addEventListener("click", activateSound, { once: true })
-    window.addEventListener("scroll", activateSound, { once: true })
-    window.addEventListener("wheel", activateSound, { once: true })
-    window.addEventListener("touchstart", activateSound, { once: true })
-    window.addEventListener("keydown", activateSound, { once: true })
-    window.addEventListener("focus", activateSound, { once: true })
-
-    video.addEventListener("canplay", tryPlayWithSound, { once: true })
-
-    return () => {
-      window.removeEventListener("pointermove", activateSound)
-      window.removeEventListener("mousemove", activateSound)
-      window.removeEventListener("pointerdown", activateSound)
-      window.removeEventListener("click", activateSound)
-      window.removeEventListener("scroll", activateSound)
-      window.removeEventListener("wheel", activateSound)
-      window.removeEventListener("touchstart", activateSound)
-      window.removeEventListener("keydown", activateSound)
-      window.removeEventListener("focus", activateSound)
-      video.removeEventListener("canplay", tryPlayWithSound)
-    }
-  }, [])
-
-  const handleToggleVideoSound = () => {
-    const video = videoRef.current
-    if (!video) return
-
-    if (isVideoMuted) {
-      video.muted = false
-      video.volume = 1.0
-      video.play().catch(() => {})
-      setIsVideoMuted(false)
-    } else {
-      video.muted = true
-      setIsVideoMuted(true)
-    }
-  }
-
-  const stopPreviewAudio = () => {
-    if (oscRef.current && audioCtxRef.current) {
-      try {
-        oscRef.current.stop()
-        audioCtxRef.current.close()
-      } catch {}
-      oscRef.current = null
-      audioCtxRef.current = null
-    }
-  }
-
-  const startPreviewAudio = (freq: number) => {
-    stopPreviewAudio()
-    try {
-      const AudioCtx =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext })
-          .webkitAudioContext
-      const ctx = new AudioCtx()
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc.type = "triangle"
-      osc.frequency.setValueAtTime(freq, ctx.currentTime)
-
-      gain.gain.setValueAtTime(0.04, ctx.currentTime)
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-      osc.start()
-
-      audioCtxRef.current = ctx
-      oscRef.current = osc
-    } catch {}
-  }
 
   const handleTogglePlay = (item: MediaItem) => {
     if (activeItem?.id === item.id && isPlaying) {
       setIsPlaying(false)
-      stopPreviewAudio()
     } else {
       setActiveItem(item)
       setIsPlaying(true)
-      if (videoRef.current) {
-        videoRef.current.muted = true
-        setIsVideoMuted(true)
-      }
-      const freq = item.type === "song" ? 220 : 330
-      startPreviewAudio(freq)
     }
   }
 
@@ -228,12 +103,10 @@ export function HomeView() {
 
   return (
     <div className="relative min-h-screen flex flex-col">
-      <VideoBackground ref={videoRef} isMuted={isVideoMuted} />
+      <VideoBackground />
 
       <HeroHeader
         subscription={subscription}
-        isVideoMuted={isVideoMuted}
-        onToggleVideoSound={handleToggleVideoSound}
         onOpenMemberModal={() => setIsMemberModalOpen(true)}
       />
 
@@ -254,23 +127,10 @@ export function HomeView() {
         item={activeItem}
         isPlaying={isPlaying}
         subscription={subscription}
-        onTogglePlay={() => {
-          if (isPlaying) {
-            setIsPlaying(false)
-            stopPreviewAudio()
-          } else if (activeItem) {
-            setIsPlaying(true)
-            if (videoRef.current) {
-              videoRef.current.muted = true
-              setIsVideoMuted(true)
-            }
-            startPreviewAudio(activeItem.type === "song" ? 220 : 330)
-          }
-        }}
+        onTogglePlay={() => setIsPlaying((prev) => !prev)}
         onClose={() => {
           setIsPlaying(false)
           setActiveItem(null)
-          stopPreviewAudio()
         }}
         onOpenSubscription={() => {
           if (activeItem) {

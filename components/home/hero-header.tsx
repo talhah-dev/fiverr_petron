@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import {
-  Volume2,
-  VolumeX,
   Eye,
   CheckCircle2,
   User,
@@ -24,15 +22,11 @@ import { UserSubscription } from "./types"
 
 interface HeroHeaderProps {
   subscription: UserSubscription
-  isVideoMuted: boolean
-  onToggleVideoSound: () => void
   onOpenMemberModal: () => void
 }
 
 export function HeroHeader({
   subscription,
-  isVideoMuted,
-  onToggleVideoSound,
   onOpenMemberModal,
 }: HeroHeaderProps) {
   const [viewCount, setViewCount] = useState(1918)
@@ -48,20 +42,7 @@ export function HeroHeader({
 
   return (
     <header className="relative w-full min-h-[100dvh] flex flex-col justify-between items-center px-4 pt-6 pb-6 z-10">
-      <div className="w-full max-w-2xl flex items-center justify-between">
-        <Button
-          variant="outline"
-          onClick={onToggleVideoSound}
-          aria-label={isVideoMuted ? "Unmute video sound" : "Mute video sound"}
-          className="cursor-pointer rounded-full bg-black/40 hover:bg-black/60 border-white/20 text-white backdrop-blur-md shadow-xs"
-        >
-          {!isVideoMuted ? (
-            <Volume2 className="size-3.5 text-white animate-pulse" />
-          ) : (
-            <VolumeX className="size-3.5 text-white/70" />
-          )}
-        </Button>
-
+      <div className="w-full max-w-2xl flex items-center justify-end">
         <div className="flex items-center gap-2">
           {isSubscribed ? (
             <Button

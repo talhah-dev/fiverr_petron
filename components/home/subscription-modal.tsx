@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Check, Loader2, Sparkles, ShoppingBag } from "lucide-react"
+import { Check, Loader2, Music, Film } from "lucide-react"
 import { FaApple, FaGoogle } from "react-icons/fa6"
 import {
   Dialog,
@@ -59,6 +59,22 @@ export function SubscriptionModal({
     }, 1000)
   }
 
+  const appleButtonLabel = isAudioItem
+    ? `Pay $${(item?.price ?? 29).toFixed(2)} with Apple Pay`
+    : isVideoItem
+    ? "Subscribe with Apple Pay ($29/yr)"
+    : selectedTier === "yearly"
+    ? "Subscribe with Apple Pay ($29/yr)"
+    : "Pay $79 with Apple Pay"
+
+  const googleButtonLabel = isAudioItem
+    ? `Pay $${(item?.price ?? 29).toFixed(2)} with Google Pay`
+    : isVideoItem
+    ? "Subscribe with Google Pay ($29/yr)"
+    : selectedTier === "yearly"
+    ? "Subscribe with Google Pay ($29/yr)"
+    : "Pay $79 with Google Pay"
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md p-6 bg-card border-border/80 shadow-lg">
@@ -66,12 +82,12 @@ export function SubscriptionModal({
           <DialogTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
             {isAudioItem ? (
               <>
-                <ShoppingBag className="size-5 text-primary" />
+                <Music className="size-5 text-primary" />
                 <span>Buy Audio • Lifetime Access</span>
               </>
             ) : isVideoItem ? (
               <>
-                <Sparkles className="size-5 text-primary" />
+                <Film className="size-5 text-primary" />
                 <span>Subscribe to Video Vault</span>
               </>
             ) : (
@@ -80,9 +96,9 @@ export function SubscriptionModal({
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
             {isAudioItem
-              ? "One-time purchase for permanent streaming and stems access."
+              ? "Direct one-time purchase for permanent lifetime streaming and download."
               : isVideoItem
-              ? "Annual subscription for unlimited 4K video streaming access."
+              ? "Annual subscription for unlimited 1-year access to all 4K videos."
               : "Instant streaming access to all unreleased songs and videos."}
           </DialogDescription>
         </DialogHeader>
@@ -95,7 +111,7 @@ export function SubscriptionModal({
                   variant="outline"
                   className="text-[10px] px-1 py-0 h-4 uppercase tracking-wider font-semibold"
                 >
-                  {isAudioItem ? "Lifetime Audio" : "Annual VIP"}
+                  {isAudioItem ? "Lifetime Audio" : "Annual Video"}
                 </Badge>
                 {item.genre && (
                   <span className="text-xs text-muted-foreground truncate">
@@ -108,8 +124,8 @@ export function SubscriptionModal({
               </p>
               <p className="text-[11px] text-muted-foreground">
                 {isAudioItem
-                  ? "Instant MP3/WAV download & stream"
-                  : "All current and upcoming 4K videos included"}
+                  ? "Instant MP3/WAV download & lifetime streaming"
+                  : "All current and upcoming 4K studio videos included"}
               </p>
             </div>
             <div className="text-right shrink-0">
@@ -174,7 +190,11 @@ export function SubscriptionModal({
         <div className="space-y-1.5 py-1 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <Check className="size-3.5 text-emerald-500 shrink-0" />
-            <span>Instant access immediately upon checkout</span>
+            <span>
+              {isAudioItem
+                ? "Instant lifetime access immediately upon checkout"
+                : "Instant 1-year access to all 4K videos upon checkout"}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Check className="size-3.5 text-emerald-500 shrink-0" />
@@ -199,7 +219,7 @@ export function SubscriptionModal({
             ) : (
               <>
                 <FaApple className="size-4.5" />
-                <span>Pay with Apple Pay</span>
+                <span>{appleButtonLabel}</span>
               </>
             )}
           </Button>
@@ -220,7 +240,7 @@ export function SubscriptionModal({
             ) : (
               <>
                 <FaGoogle className="size-4" />
-                <span>Pay with Google Pay</span>
+                <span>{googleButtonLabel}</span>
               </>
             )}
           </Button>

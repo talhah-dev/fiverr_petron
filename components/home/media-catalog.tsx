@@ -5,11 +5,11 @@ import Image from "next/image"
 import {
   Play,
   Pause,
-  Download,
   Sparkles,
   ShoppingCart,
-  Headphones,
+  Music,
   Film,
+  Check,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -33,6 +33,9 @@ export function MediaCatalog({
 }: MediaCatalogProps) {
   const [filter, setFilter] = useState<"all" | "song" | "video">("all")
 
+  const audioCount = items.filter((item) => item.type === "song").length
+  const videoCount = items.filter((item) => item.type === "video").length
+
   const filteredItems = items.filter((item) => {
     if (filter === "all") return true
     return item.type === filter
@@ -41,13 +44,13 @@ export function MediaCatalog({
   return (
     <section id="media-catalog-section" className="w-full max-w-2xl px-3 sm:px-4 pb-24">
       <div className="flex items-center justify-between gap-2 pb-3 border-b border-border/40 mb-3 sm:mb-4">
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <h2 className="text-base font-semibold tracking-tight text-foreground">
-            Tracks
+            Vault
           </h2>
-          <Badge variant="secondary" className="text-xs px-1.5 py-0 h-4.5 font-mono">
-            {items.length}
-          </Badge>
+          <span className="text-xs text-muted-foreground font-mono">
+            {audioCount} Audios • {videoCount} Videos
+          </span>
         </div>
 
         <div className="inline-flex items-center p-0.5 bg-muted/60 rounded-lg text-xs shrink-0">
@@ -59,7 +62,7 @@ export function MediaCatalog({
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            All
+            All ({items.length})
           </button>
           <button
             onClick={() => setFilter("song")}
@@ -69,7 +72,7 @@ export function MediaCatalog({
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Audio
+            Audio ({audioCount})
           </button>
           <button
             onClick={() => setFilter("video")}
@@ -79,12 +82,12 @@ export function MediaCatalog({
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Videos
+            Videos ({videoCount})
           </button>
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {filteredItems.map((item, index) => {
           const isPlaying = activePlayingId === item.id
           const isPurchased = (subscription.purchasedItemIds ?? []).includes(item.id)
@@ -93,6 +96,8 @@ export function MediaCatalog({
             subscription.tier === "lifetime" ||
             (item.type === "video" && subscription.tier === "yearly") ||
             isPurchased
+
+          const isAudio = item.type === "song"
 
           return (
             <Card
@@ -105,36 +110,81 @@ export function MediaCatalog({
                     {index + 1}
                   </span>
 
-                  <div className="relative size-10 sm:size-11 rounded-md overflow-hidden bg-muted shrink-0 border border-border/60 group">
-                    <Image
-                      src={item.thumbnailUrl ?? "/avatar.jpg"}
-                      alt={item.title}
-                      width={44}
-                      height={44}
-                      className="size-full object-cover"
-                    />
-                    <button
-                      onClick={() => onTogglePlay(item)}
-                      aria-label={isPlaying ? "Pause track" : "Play preview"}
-                      className="absolute inset-0 bg-black/40 hover:bg-black/60 flex items-center justify-center transition-opacity cursor-pointer text-white"
-                    >
-                      {isPlaying ? (
-                        <Pause className="size-4" />
-                      ) : (
-                        <Play className="size-4 ml-0.5" />
-                      )}
-                    </button>
-                  </div>
+                  {isAudio ? (
+                    <div className="relative size-11 sm:size-12 rounded-lg bg-muted/80 shrink-0 border border-border flex items-center justify-center group overflow-hidden">
+                      <div className="flex flex-col items-center justify-center size-full group-hover:scale-105 transition-transform">
+                        <Music className="size-5 text-foreground/80" />
+                        <span className="text-[8px] font-mono text-muted-foreground font-semibold uppercase mt-0.5">
+                          AUDIO
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => onTogglePlay(item)}
+                        aria-label={isPlaying ? "Pause track" : "Play preview"}
+                        className={`absolute inset-0 flex items-center justify-center transition-all cursor-pointer text-white ${
+                          isPlaying
+                            ? "bg-black/60 opacity-100"
+                            : "bg-black/40 opacity-0 group-hover:opacity-100"
+                        }`}
+                      >
+                        {isPlaying ? (
+                          <Pause className="size-4" />
+                        ) : (
+                          <Play className="size-4 ml-0.5" />
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="relative w-16 sm:w-20 h-11 sm:h-12 rounded-lg overflow-hidden bg-muted shrink-0 border border-border group">
+                      <Image
+                        src={item.thumbnailUrl ?? "/avatar.jpg"}
+                        alt={item.title}
+                        width={80}
+                        height={48}
+                        className="size-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                      <div className="absolute top-1 left-1 bg-black/75 backdrop-blur-xs px-1 py-0.2 rounded text-[8px] font-semibold text-white flex items-center gap-0.5 pointer-events-none">
+                        <Film className="size-2" />
+                        <span>4K</span>
+                      </div>
+                      <div className="absolute bottom-1 right-1 bg-black/75 backdrop-blur-xs text-[8px] font-mono px-1 py-0.2 rounded text-white pointer-events-none">
+                        {item.duration}
+                      </div>
+                      <button
+                        onClick={() => onTogglePlay(item)}
+                        aria-label={isPlaying ? "Pause video" : "Play video preview"}
+                        className={`absolute inset-0 flex items-center justify-center transition-all cursor-pointer text-white ${
+                          isPlaying
+                            ? "bg-black/60 opacity-100"
+                            : "bg-black/30 group-hover:bg-black/60 opacity-0 group-hover:opacity-100"
+                        }`}
+                      >
+                        {isPlaying ? (
+                          <Pause className="size-4" />
+                        ) : (
+                          <Play className="size-4 ml-0.5" />
+                        )}
+                      </button>
+                    </div>
+                  )}
 
                   <div className="min-w-0 flex-1 space-y-0.5">
-                    <p className="text-xs sm:text-sm font-semibold text-foreground truncate">
-                      {item.title}
-                    </p>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <p className="text-xs sm:text-sm font-semibold text-foreground truncate">
+                        {item.title}
+                      </p>
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] px-1 py-0 h-3.5 uppercase font-medium"
+                      >
+                        {isAudio ? "Audio" : "4K Video"}
+                      </Badge>
+                    </div>
 
                     <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground">
                       <span className="flex items-center gap-1 font-medium text-foreground/80 shrink-0">
-                        {item.type === "song" ? (
-                          <Headphones className="size-3" />
+                        {isAudio ? (
+                          <Music className="size-3" />
                         ) : (
                           <Film className="size-3" />
                         )}
@@ -169,20 +219,19 @@ export function MediaCatalog({
                       variant="outline"
                       size="sm"
                       onClick={() => onTogglePlay(item)}
-                      className="text-xs gap-1.5 h-8 px-2.5 sm:px-3 text-foreground border-border/80 hover:bg-muted cursor-pointer shrink-0"
+                      className="text-xs gap-1.5 h-8 px-2.5 sm:px-3 text-emerald-500 border-border/80 hover:bg-muted cursor-pointer shrink-0"
                     >
-                      <Download className="size-3.5 text-emerald-500" />
-                      <span>Stream</span>
+                      <Check className="size-3.5" />
+                      <span>{isAudio ? "Stream" : "Watch"}</span>
                     </Button>
-                  ) : item.type === "song" ? (
+                  ) : isAudio ? (
                     <Button
                       onClick={() => onOpenPayment(item)}
                       size="sm"
                       className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-8 sm:h-8.5 px-2.5 sm:px-3.5 rounded-md gap-1.5 cursor-pointer shadow-xs text-xs shrink-0 whitespace-nowrap"
                     >
                       <ShoppingCart className="size-3.5" />
-                      <span className="hidden sm:inline">Buy </span>
-                      <span>${item.price.toFixed(2)}</span>
+                      <span>Buy ${item.price.toFixed(2)}</span>
                     </Button>
                   ) : (
                     <Button
