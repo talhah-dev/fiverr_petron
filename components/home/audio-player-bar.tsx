@@ -1,0 +1,118 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { Play, Pause, X, Lock } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { MediaItem, UserSubscription } from "./types"
+
+interface AudioPlayerBarProps {
+  item: MediaItem | null
+  isPlaying: boolean
+  subscription: UserSubscription
+  onTogglePlay: () => void
+  onClose: () => void
+  onOpenSubscription: () => void
+}
+
+export function AudioPlayerBar({
+  item,
+  isPlaying,
+  subscription,
+  onTogglePlay,
+  onClose,
+  onOpenSubscription,
+}: AudioPlayerBarProps) {
+  const [progress, setProgress] = useState(15)
+
+  useEffect(() => {
+    if (!isPlaying) return
+    const interval = setInterval(() => {
+      setProgress((prev) => (prev >= 100 ? 0 : prev + 1))
+    }, 400)
+    return () => clearInterval(interval)
+  }, [isPlaying])
+
+  if (!item) return null
+
+  const isSubscribed = subscription.tier !== "free"
+  const isPreview = item.isExclusive && !isSubscribed
+
+  return (
+    <div className="fixed bottom-4 inset-x-0 mx-auto max-w-xl px-4 z-40 animate-in fade-in slide-in-from-bottom-3 duration-200">
+      <div className="bg-card/90 backdrop-blur-md border border-border/80 rounded-xl p-3 shadow-lg flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <Button
+            variant="default"
+            size="icon"
+            onClick={onTogglePlay}
+            className="size-9 rounded-full shrink-0"
+            aria-label={isPlaying ? "Pause" : "Play"}
+          >
+            {isPlaying ? (
+              <Pause className="size-4" />
+            ) : (
+              <Play className="size-4 ml-0.5" />
+            )}
+          </Button>
+
+          <div className="min-w-0 space-y-0.5">
+            <div className="flex items-center gap-2">
+              <p className="text-xs font-semibold text-foreground truncate">
+                {item.title}
+              </p>
+              {isPreview ? (
+                <Badge variant="outline" className="text-[9px] px-1 py-0 h-3.5">
+                  30s Teaser
+                </Badge>
+              ) : (
+                <Badge
+                  variant="secondary"
+                  className="text-[9px] px-1 py-0 h-3.5 text-emerald-500"
+                >
+                  Full Audio
+                </Badge>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="w-28 sm:w-44 h-1 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-foreground transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <span className="text-[10px] text-muted-foreground font-mono">
+                {item.duration}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 shrink-0">
+          {isPreview && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onOpenSubscription}
+              className="text-xs h-7 gap-1 border-border/80"
+            >
+              <Lock className="size-3" />
+              <span>Unlock Full</span>
+            </Button>
+          )}
+
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            onClick={onClose}
+            aria-label="Close player"
+            className="text-muted-foreground hover:text-foreground size-7"
+          >
+            <X className="size-3.5" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}

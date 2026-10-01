@@ -1,0 +1,272 @@
+"use client"
+
+import { useState, useEffect, useRef, useSyncExternalStore } from "react"
+import Link from "next/link"
+import { useTheme } from "next-themes"
+import {
+  Volume2,
+  VolumeX,
+  Eye,
+  CheckCircle2,
+  Sparkles,
+  User,
+  Sun,
+  Moon,
+} from "lucide-react"
+import {
+  FaYoutube,
+  FaInstagram,
+  FaTiktok,
+  FaSpotify,
+  FaEnvelope,
+} from "react-icons/fa6"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { ProfileAvatar } from "./profile-avatar"
+import { UserSubscription } from "./types"
+
+interface HeroHeaderProps {
+  subscription: UserSubscription
+  onOpenSubscription: () => void
+  onOpenMemberModal: () => void
+}
+
+const emptySubscribe = () => () => {}
+
+export function HeroHeader({
+  subscription,
+  onOpenSubscription,
+  onOpenMemberModal,
+}: HeroHeaderProps) {
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false)
+  const [viewCount, setViewCount] = useState(1918)
+  const { resolvedTheme, setTheme } = useTheme()
+
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  )
+
+  const audioContextRef = useRef<AudioContext | null>(null)
+  const oscillatorRef = useRef<OscillatorNode | null>(null)
+  const gainNodeRef = useRef<GainNode | null>(null)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setViewCount((prev) => prev + (Math.random() > 0.6 ? 1 : 0))
+    }, 4500)
+    return () => clearInterval(timer)
+  }, [])
+
+  const toggleSound = () => {
+    if (!isPlayingAudio) {
+      try {
+        const AudioCtx =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext })
+            .webkitAudioContext
+        const ctx = new AudioCtx()
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+
+        osc.type = "sine"
+        osc.frequency.setValueAtTime(164.81, ctx.currentTime)
+
+        gain.gain.setValueAtTime(0.01, ctx.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 1)
+
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+        osc.start()
+
+        audioContextRef.current = ctx
+        oscillatorRef.current = osc
+        gainNodeRef.current = gain
+        setIsPlayingAudio(true)
+      } catch {
+        setIsPlayingAudio(true)
+      }
+    } else {
+      if (gainNodeRef.current && audioContextRef.current) {
+        gainNodeRef.current.gain.exponentialRampToValueAtTime(
+          0.0001,
+          audioContextRef.current.currentTime + 0.5
+        )
+        setTimeout(() => {
+          oscillatorRef.current?.stop()
+          audioContextRef.current?.close()
+          audioContextRef.current = null
+          oscillatorRef.current = null
+          gainNodeRef.current = null
+        }, 500)
+      }
+      setIsPlayingAudio(false)
+    }
+  }
+
+  const isSubscribed = subscription.tier !== "free"
+
+  return (
+    <header className="relative w-full pt-6 pb-10 px-4 flex flex-col items-center">
+      <div className="w-full max-w-2xl flex items-center justify-between mb-8">
+        <Button
+          variant="outline"
+          onClick={toggleSound}
+          aria-label={isPlayingAudio ? "Mute audio" : "Unmute audio"}
+          className="cursor-pointer rounded-full"
+        >
+          {isPlayingAudio ? (
+            <Volume2 className="size-3.5 text-foreground animate-pulse" />
+          ) : (
+            <VolumeX className="size-3.5 text-muted-foreground" />
+          )}
+        </Button>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon-sm"
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            aria-label="Toggle dark mode"
+            className="cursor-pointer"
+          >
+            {mounted ? (
+              resolvedTheme === "dark" ? (
+                <Sun className="size-3.5 text-foreground" />
+              ) : (
+                <Moon className="size-3.5 text-foreground" />
+              )
+            ) : (
+              <span className="size-3.5" />
+            )}
+          </Button>
+
+          {isSubscribed ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onOpenMemberModal}
+              className="gap-1.5 cursor-pointer text-xs"
+            >
+              <CheckCircle2 className="size-3 text-emerald-500" />
+              <span className="capitalize">{subscription.tier} Member</span>
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onOpenMemberModal}
+              className="gap-1.5 cursor-pointer text-xs"
+            >
+              <User className="size-3.5 text-muted-foreground" />
+              <span>Sign In</span>
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center text-center space-y-4 max-w-md w-full">
+        <ProfileAvatar initialName="swagsxn" size={96} />
+
+        <div className="space-y-1">
+          <div className="flex items-center justify-center gap-1.5">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              swagsxn
+            </h1>
+            <Badge variant="secondary" className="text-[10px] py-0 px-1.5 h-4">
+              PRO
+            </Badge>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 py-1">
+          <Link
+            href="mailto:contact@swagsxn.art"
+            aria-label="Email"
+            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50"
+          >
+            <FaEnvelope className="size-4" />
+          </Link>
+          <Link
+            href="https://youtube.com"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="YouTube"
+            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50"
+          >
+            <FaYoutube className="size-4" />
+          </Link>
+          <Link
+            href="https://instagram.com"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Instagram"
+            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50"
+          >
+            <FaInstagram className="size-4" />
+          </Link>
+          <Link
+            href="https://tiktok.com"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="TikTok"
+            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50"
+          >
+            <FaTiktok className="size-4" />
+          </Link>
+          <Link
+            href="https://spotify.com"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Spotify"
+            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50"
+          >
+            <FaSpotify className="size-4" />
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-0.5">
+          <Eye className="size-3.5" />
+          <span className="font-mono">{viewCount.toLocaleString()}</span>
+          <span>views</span>
+        </div>
+
+        <div className="flex items-center justify-center gap-2.5 pt-2.5 w-full sm:w-auto">
+          {!isSubscribed ? (
+            <Button
+              onClick={onOpenSubscription}
+              size="default"
+              className="gap-1.5 px-6 font-medium shadow-none cursor-pointer"
+            >
+              <Sparkles className="size-4" />
+              Subscribe & Unlock
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="default"
+              onClick={onOpenMemberModal}
+              className="gap-1.5 px-5 font-medium cursor-pointer"
+            >
+              <CheckCircle2 className="size-4 text-emerald-500" />
+              VIP Access Granted
+            </Button>
+          )}
+
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => {
+              const el = document.getElementById("media-catalog-section")
+              el?.scrollIntoView({ behavior: "smooth" })
+            }}
+            className="px-4 cursor-pointer"
+          >
+            Browse Vault
+          </Button>
+        </div>
+      </div>
+    </header>
+  )
+}

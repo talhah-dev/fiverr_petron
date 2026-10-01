@@ -1,0 +1,201 @@
+"use client"
+
+import { useState } from "react"
+import { LogOut } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { SubscriptionTier, UserSubscription } from "./types"
+
+interface MemberStatusModalProps {
+  isOpen: boolean
+  onClose: () => void
+  subscription: UserSubscription
+  onUpdateSubscription: (updates: Partial<UserSubscription>) => void
+  onSignInMock: (email: string, tier: SubscriptionTier) => void
+  onSignOut: () => void
+}
+
+export function MemberStatusModal({
+  isOpen,
+  onClose,
+  subscription,
+  onUpdateSubscription,
+  onSignInMock,
+  onSignOut,
+}: MemberStatusModalProps) {
+  const [inputEmail, setInputEmail] = useState("")
+  const [selectedDemoTier, setSelectedDemoTier] = useState<SubscriptionTier>("yearly")
+
+  const isSubscribed = subscription.tier !== "free"
+
+  const handleSignIn = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!inputEmail.trim()) return
+    onSignInMock(inputEmail.trim(), selectedDemoTier)
+    onClose()
+  }
+
+  const handleToggleAutoRenew = () => {
+    onUpdateSubscription({ autoRenew: !subscription.autoRenew })
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md p-6 bg-card border-border/80 shadow-lg">
+        <DialogHeader className="space-y-1 text-left">
+          <DialogTitle className="text-lg font-bold tracking-tight">
+            {isSubscribed ? "Member Account & Access" : "Customer Sign In"}
+          </DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground">
+            {isSubscribed
+              ? "Manage your active subscription and playback permissions."
+              : "Enter your payment email to restore your yearly or lifetime access."}
+          </DialogDescription>
+        </DialogHeader>
+
+        {isSubscribed ? (
+          <div className="space-y-4 py-2">
+            <div className="p-3.5 rounded-lg border border-border/60 bg-muted/20 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Plan Status</span>
+                <Badge
+                  variant={
+                    subscription.tier === "lifetime" ? "default" : "secondary"
+                  }
+                  className="capitalize text-xs font-semibold"
+                >
+                  {subscription.tier} Pass
+                </Badge>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Associated Email</span>
+                <span className="font-mono text-foreground">
+                  {subscription.email || "customer@icloud.com"}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Access Validity</span>
+                <span className="font-medium text-foreground">
+                  {subscription.tier === "lifetime"
+                    ? "Permanent Lifetime Access"
+                    : subscription.activeUntil || "Valid for 365 Days"}
+                </span>
+              </div>
+
+              {subscription.tier === "yearly" && (
+                <div className="flex items-center justify-between text-xs pt-1 border-t border-border/40">
+                  <span className="text-muted-foreground">Auto Renewal</span>
+                  <span
+                    className={
+                      subscription.autoRenew
+                        ? "text-emerald-500 font-medium"
+                        : "text-amber-500 font-medium"
+                    }
+                  >
+                    {subscription.autoRenew ? "Enabled" : "Cancelled (Access Active)"}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {subscription.tier === "yearly" && (
+              <div className="space-y-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleToggleAutoRenew}
+                  className="w-full text-xs h-8 cursor-pointer"
+                >
+                  {subscription.autoRenew
+                    ? "Cancel Yearly Renewal"
+                    : "Resume Yearly Renewal"}
+                </Button>
+                <p className="text-[10px] text-muted-foreground text-center">
+                  Canceling stops future charges while keeping full access for
+                  the remaining year.
+                </p>
+              </div>
+            )}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                onSignOut()
+                onClose()
+              }}
+              className="w-full text-xs text-muted-foreground hover:text-destructive h-8 gap-1.5 cursor-pointer"
+            >
+              <LogOut className="size-3.5" />
+              Sign Out (Switch to Guest Mode)
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSignIn} className="space-y-5 pt-3 pb-1">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-foreground block">
+                Account Email
+              </label>
+              <Input
+                type="email"
+                placeholder="youremail@icloud.com"
+                value={inputEmail}
+                onChange={(e) => setInputEmail(e.target.value)}
+                required
+                className="h-10 text-sm px-3"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-foreground block">
+                Restore Plan Tier
+              </label>
+              <div className="grid grid-cols-2 gap-2.5">
+                <Button
+                  type="button"
+                  variant={
+                    selectedDemoTier === "yearly" ? "default" : "outline"
+                  }
+                  size="default"
+                  onClick={() => setSelectedDemoTier("yearly")}
+                  className="text-xs h-9 cursor-pointer"
+                >
+                  Yearly Member
+                </Button>
+                <Button
+                  type="button"
+                  variant={
+                    selectedDemoTier === "lifetime" ? "default" : "outline"
+                  }
+                  size="default"
+                  onClick={() => setSelectedDemoTier("lifetime")}
+                  className="text-xs h-9 cursor-pointer"
+                >
+                  Lifetime VIP
+                </Button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full text-xs h-10 font-medium cursor-pointer"
+            >
+              Sign In with Magic Link
+            </Button>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
