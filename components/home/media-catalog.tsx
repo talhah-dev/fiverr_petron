@@ -10,6 +10,7 @@ import {
   Music,
   Film,
   Check,
+  Lock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -22,6 +23,7 @@ interface MediaCatalogProps {
   activePlayingId: string | null
   onTogglePlay: (item: MediaItem) => void
   onOpenPayment: (item: MediaItem) => void
+  onWatchVideo: (item: MediaItem) => void
 }
 
 export function MediaCatalog({
@@ -30,6 +32,7 @@ export function MediaCatalog({
   activePlayingId,
   onTogglePlay,
   onOpenPayment,
+  onWatchVideo,
 }: MediaCatalogProps) {
   const [filter, setFilter] = useState<"all" | "song" | "video">("all")
 
@@ -147,18 +150,20 @@ export function MediaCatalog({
                         {item.duration}
                       </div>
                       <button
-                        onClick={() => onTogglePlay(item)}
-                        aria-label={isPlaying ? "Pause video" : "Play video preview"}
-                        className={`absolute inset-0 flex items-center justify-center transition-all cursor-pointer text-white ${
-                          isPlaying
-                            ? "bg-black/60 opacity-100"
-                            : "bg-black/30 group-hover:bg-black/60 opacity-0 group-hover:opacity-100"
-                        }`}
+                        onClick={() => {
+                          if (isUnlocked) {
+                            onWatchVideo(item)
+                          } else {
+                            onOpenPayment(item)
+                          }
+                        }}
+                        aria-label={isUnlocked ? "Watch video" : "Subscribe to video"}
+                        className="absolute inset-0 flex items-center justify-center transition-all cursor-pointer text-white bg-black/30 group-hover:bg-black/60 opacity-0 group-hover:opacity-100"
                       >
-                        {isPlaying ? (
-                          <Pause className="size-3.5" />
+                        {isUnlocked ? (
+                          <Play className="size-4 ml-0.5 fill-current" />
                         ) : (
-                          <Play className="size-3.5 ml-0.5" />
+                          <Lock className="size-3.5 text-white/90" />
                         )}
                       </button>
                     </div>
@@ -206,11 +211,26 @@ export function MediaCatalog({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => onTogglePlay(item)}
+                      onClick={() => {
+                        if (isAudio) {
+                          onTogglePlay(item)
+                        } else {
+                          onWatchVideo(item)
+                        }
+                      }}
                       className="text-xs gap-1 h-7.5 sm:h-8 px-2 sm:px-3 text-emerald-500 border-border/80 hover:bg-muted cursor-pointer shrink-0"
                     >
-                      <Check className="size-3.5" />
-                      <span>{isAudio ? "Stream" : "Watch"}</span>
+                      {isAudio ? (
+                        <>
+                          <Check className="size-3.5" />
+                          <span>Stream</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="size-3.5 fill-current" />
+                          <span>Watch</span>
+                        </>
+                      )}
                     </Button>
                   ) : isAudio ? (
                     <Button

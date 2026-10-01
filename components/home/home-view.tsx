@@ -7,6 +7,7 @@ import { MediaCatalog } from "./media-catalog"
 import { SubscriptionModal } from "./subscription-modal"
 import { MemberStatusModal } from "./member-status-modal"
 import { AudioPlayerBar } from "./audio-player-bar"
+import { VideoModal } from "./video-modal"
 import { INITIAL_MEDIA_ITEMS } from "./mock-data"
 import { MediaItem, SubscriptionTier, UserSubscription } from "./types"
 
@@ -24,8 +25,19 @@ export function HomeView() {
   const [activeItem, setActiveItem] = useState<MediaItem | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(true)
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
+  const [selectedVideoItem, setSelectedVideoItem] = useState<MediaItem | null>(null)
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
+
+  const handleEnterWebsite = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = false
+      videoRef.current.volume = 1.0
+      videoRef.current.play().catch(() => {})
+      setIsMuted(false)
+    }
+  }
 
   const handleToggleMute = () => {
     if (videoRef.current) {
@@ -41,7 +53,30 @@ export function HomeView() {
     }
   }
 
+  const handleWatchVideo = (item: MediaItem) => {
+    if (isPlaying) {
+      setIsPlaying(false)
+    }
+    if (videoRef.current) {
+      videoRef.current.muted = true
+      setIsMuted(true)
+    }
+    setSelectedVideoItem(item)
+    setIsVideoModalOpen(true)
+  }
+
   const handleTogglePlay = (item: MediaItem) => {
+    if (item.type === "video") {
+      const isPurchased = (subscription.purchasedItemIds ?? []).includes(item.id)
+      const isUnlocked = !item.isExclusive || isPurchased
+      if (isUnlocked) {
+        handleWatchVideo(item)
+      } else {
+        handleOpenPayment(item)
+      }
+      return
+    }
+
     if (activeItem?.id === item.id && isPlaying) {
       setIsPlaying(false)
     } else {
@@ -120,7 +155,11 @@ export function HomeView() {
 
   return (
     <div className="relative min-h-screen flex flex-col w-full overflow-x-hidden">
-      <VideoBackground ref={videoRef} isMuted={isMuted} />
+      <VideoBackground
+        ref={videoRef}
+        isMuted={isMuted}
+        onEnter={handleEnterWebsite}
+      />
 
       <HeroHeader
         subscription={subscription}
@@ -139,6 +178,7 @@ export function HomeView() {
           activePlayingId={isPlaying ? activeItem?.id ?? null : null}
           onTogglePlay={handleTogglePlay}
           onOpenPayment={handleOpenPayment}
+          onWatchVideo={handleWatchVideo}
         />
       </main>
 
@@ -154,8 +194,6 @@ export function HomeView() {
         onOpenSubscription={() => {
           if (activeItem) {
             handleOpenPayment(activeItem)
-          } else {
-            setIsSubscriptionModalOpen(true)
           }
         }}
       />
@@ -164,7 +202,6 @@ export function HomeView() {
         isOpen={isSubscriptionModalOpen}
         onClose={() => {
           setIsSubscriptionModalOpen(false)
-          setSelectedPaymentItem(null)
         }}
         item={selectedPaymentItem}
         onSuccessfulSubscription={handleSuccessfulSubscription}
@@ -176,6 +213,15 @@ export function HomeView() {
         subscription={subscription}
         onSignInMock={handleSignInMock}
         onSignOut={handleSignOut}
+      />
+
+      <VideoModal
+        isOpen={isVideoModalOpen}
+        onClose={() => {
+          setIsVideoModalOpen(false)
+          setSelectedVideoItem(null)
+        }}
+        item={selectedVideoItem}
       />
     </div>
   )

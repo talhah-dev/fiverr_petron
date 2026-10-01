@@ -31,12 +31,12 @@ export function SubscriptionModal({
   item,
   onSuccessfulSubscription,
 }: SubscriptionModalProps) {
-  const [selectedTier, setSelectedTier] = useState<"yearly" | "lifetime">("yearly")
   const [isProcessing, setIsProcessing] = useState(false)
   const [activePaymentMethod, setActivePaymentMethod] = useState<string | null>(null)
 
-  const isAudioItem = item?.type === "song"
-  const isVideoItem = item?.type === "video"
+  if (!item) return null
+
+  const isAudioItem = item.type === "song"
 
   const handleSimulatePayment = (method: string) => {
     setActivePaymentMethod(method)
@@ -49,31 +49,19 @@ export function SubscriptionModal({
         method === "apple"
           ? "customer@icloud.com"
           : "customer@gmail.com"
-      const tier: SubscriptionTier = isAudioItem
-        ? "lifetime"
-        : isVideoItem
-        ? "yearly"
-        : selectedTier
-      onSuccessfulSubscription(tier, mockEmail, item?.id)
+      const tier: SubscriptionTier = isAudioItem ? "lifetime" : "yearly"
       onClose()
+      onSuccessfulSubscription(tier, mockEmail, item.id)
     }, 1000)
   }
 
   const appleButtonLabel = isAudioItem
-    ? `Pay $${(item?.price ?? 29).toFixed(2)} with Apple Pay`
-    : isVideoItem
-    ? "Subscribe with Apple Pay ($29/yr)"
-    : selectedTier === "yearly"
-    ? "Subscribe with Apple Pay ($29/yr)"
-    : "Pay $79 with Apple Pay"
+    ? `Pay $${item.price.toFixed(2)} with Apple Pay`
+    : "Subscribe with Apple Pay ($29/yr)"
 
   const googleButtonLabel = isAudioItem
-    ? `Pay $${(item?.price ?? 29).toFixed(2)} with Google Pay`
-    : isVideoItem
-    ? "Subscribe with Google Pay ($29/yr)"
-    : selectedTier === "yearly"
-    ? "Subscribe with Google Pay ($29/yr)"
-    : "Pay $79 with Google Pay"
+    ? `Pay $${item.price.toFixed(2)} with Google Pay`
+    : "Subscribe with Google Pay ($29/yr)"
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -85,110 +73,56 @@ export function SubscriptionModal({
                 <Music className="size-4.5 text-primary shrink-0" />
                 <span className="truncate">Buy Audio • Lifetime Access</span>
               </>
-            ) : isVideoItem ? (
+            ) : (
               <>
                 <Film className="size-4.5 text-primary shrink-0" />
                 <span className="truncate">Subscribe to Video Vault</span>
               </>
-            ) : (
-              <span className="truncate">Unlock Creator Vault</span>
             )}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground leading-relaxed break-words">
             {isAudioItem
               ? "Direct one-time purchase for permanent lifetime streaming and download."
-              : isVideoItem
-              ? "Annual subscription for unlimited 1-year access to all 4K videos."
-              : "Instant streaming access to all unreleased songs and videos."}
+              : "Annual subscription for unlimited 1-year access to all 4K videos."}
           </DialogDescription>
         </DialogHeader>
 
-        {item ? (
-          <div className="p-3 sm:p-3.5 my-2 rounded-lg border border-border/80 bg-muted/20 space-y-2">
-            <div className="flex items-center justify-between gap-2 min-w-0">
-              <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                <Badge
-                  variant="outline"
-                  className="text-[10px] px-1 py-0 h-4 uppercase tracking-wider font-semibold shrink-0"
-                >
-                  {isAudioItem ? "Lifetime Audio" : "Annual Video"}
-                </Badge>
-                {item.genre && (
-                  <span className="text-xs text-muted-foreground truncate">
-                    {item.genre}
-                  </span>
-                )}
-              </div>
-              <div className="text-right shrink-0">
-                <span className="text-base sm:text-lg font-bold text-foreground">
-                  ${item.price.toFixed(2)}
+        <div className="p-3 sm:p-3.5 my-2 rounded-lg border border-border/80 bg-muted/20 space-y-2">
+          <div className="flex items-center justify-between gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+              <Badge
+                variant="outline"
+                className="text-[10px] px-1 py-0 h-4 uppercase tracking-wider font-semibold shrink-0"
+              >
+                {isAudioItem ? "Lifetime Audio" : "Annual Video"}
+              </Badge>
+              {item.genre && (
+                <span className="text-xs text-muted-foreground truncate">
+                  {item.genre}
                 </span>
-                <span className="text-[10px] text-muted-foreground ml-1">
-                  {isAudioItem ? "one-time" : "/ yr"}
-                </span>
-              </div>
+              )}
             </div>
-
-            <div className="min-w-0 space-y-0.5 pt-0.5">
-              <p className="text-sm font-semibold text-foreground truncate">
-                {item.title}
-              </p>
-              <p className="text-[11px] text-muted-foreground leading-normal">
-                {isAudioItem
-                  ? "Instant MP3/WAV download & lifetime streaming"
-                  : "All current and upcoming 4K studio videos included"}
-              </p>
+            <div className="text-right shrink-0">
+              <span className="text-base sm:text-lg font-bold text-foreground">
+                ${item.price.toFixed(2)}
+              </span>
+              <span className="text-[10px] text-muted-foreground ml-1">
+                {isAudioItem ? "one-time" : "/ yr"}
+              </span>
             </div>
           </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-2.5 my-2">
-            <button
-              type="button"
-              onClick={() => setSelectedTier("yearly")}
-              className={`p-3 rounded-lg border text-left transition-all ${
-                selectedTier === "yearly"
-                  ? "border-primary bg-primary/5 text-foreground ring-1 ring-primary/30"
-                  : "border-border/60 bg-muted/20 text-muted-foreground hover:border-border"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider">
-                  Yearly
-                </span>
-                <Badge variant="outline" className="text-[10px] py-0 px-1 h-4">
-                  Videos
-                </Badge>
-              </div>
-              <div className="mt-2">
-                <span className="text-xl font-bold text-foreground">$29</span>
-                <span className="text-xs text-muted-foreground"> / year</span>
-              </div>
-            </button>
 
-            <button
-              type="button"
-              onClick={() => setSelectedTier("lifetime")}
-              className={`p-3 rounded-lg border text-left transition-all ${
-                selectedTier === "lifetime"
-                  ? "border-primary bg-primary/5 text-foreground ring-1 ring-primary/30"
-                  : "border-border/60 bg-muted/20 text-muted-foreground hover:border-border"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider">
-                  Lifetime
-                </span>
-                <Badge variant="secondary" className="text-[10px] py-0 px-1 h-4">
-                  VIP
-                </Badge>
-              </div>
-              <div className="mt-2">
-                <span className="text-xl font-bold text-foreground">$79</span>
-                <span className="text-xs text-muted-foreground"> one-time</span>
-              </div>
-            </button>
+          <div className="min-w-0 space-y-0.5 pt-0.5">
+            <p className="text-sm font-semibold text-foreground truncate">
+              {item.title}
+            </p>
+            <p className="text-[11px] text-muted-foreground leading-normal">
+              {isAudioItem
+                ? "Instant MP3/WAV download & lifetime streaming"
+                : "All current and upcoming 4K studio videos included"}
+            </p>
           </div>
-        )}
+        </div>
 
         <div className="space-y-1.5 py-1 text-xs text-muted-foreground">
           <div className="flex items-start gap-2">
