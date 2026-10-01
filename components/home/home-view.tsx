@@ -30,15 +30,6 @@ export function HomeView() {
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
-  const handleEnterWebsite = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = false
-      videoRef.current.volume = 1.0
-      videoRef.current.play().catch(() => {})
-      setIsMuted(false)
-    }
-  }
-
   const handleToggleMute = () => {
     if (videoRef.current) {
       if (isMuted) {
@@ -155,11 +146,7 @@ export function HomeView() {
 
   return (
     <div className="relative min-h-screen flex flex-col w-full overflow-x-hidden">
-      <VideoBackground
-        ref={videoRef}
-        isMuted={isMuted}
-        onEnter={handleEnterWebsite}
-      />
+      <VideoBackground ref={videoRef} isMuted={isMuted} />
 
       <HeroHeader
         subscription={subscription}

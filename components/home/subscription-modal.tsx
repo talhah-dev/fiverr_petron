@@ -31,6 +31,7 @@ export function SubscriptionModal({
   item,
   onSuccessfulSubscription,
 }: SubscriptionModalProps) {
+  const [selectedVideoTier, setSelectedVideoTier] = useState<"yearly" | "lifetime">("yearly")
   const [isProcessing, setIsProcessing] = useState(false)
   const [activePaymentMethod, setActivePaymentMethod] = useState<string | null>(null)
 
@@ -49,7 +50,7 @@ export function SubscriptionModal({
         method === "apple"
           ? "customer@icloud.com"
           : "customer@gmail.com"
-      const tier: SubscriptionTier = isAudioItem ? "lifetime" : "yearly"
+      const tier: SubscriptionTier = isAudioItem ? "lifetime" : selectedVideoTier
       onClose()
       onSuccessfulSubscription(tier, mockEmail, item.id)
     }, 1000)
@@ -57,11 +58,15 @@ export function SubscriptionModal({
 
   const appleButtonLabel = isAudioItem
     ? `Pay $${item.price.toFixed(2)} with Apple Pay`
-    : "Subscribe with Apple Pay ($29/yr)"
+    : selectedVideoTier === "yearly"
+    ? "Subscribe with Apple Pay ($29/yr)"
+    : "Pay $79 with Apple Pay"
 
   const googleButtonLabel = isAudioItem
     ? `Pay $${item.price.toFixed(2)} with Google Pay`
-    : "Subscribe with Google Pay ($29/yr)"
+    : selectedVideoTier === "yearly"
+    ? "Subscribe with Google Pay ($29/yr)"
+    : "Pay $79 with Google Pay"
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -83,7 +88,9 @@ export function SubscriptionModal({
           <DialogDescription className="text-xs text-muted-foreground leading-relaxed break-words">
             {isAudioItem
               ? "Direct one-time purchase for permanent lifetime streaming and download."
-              : "Annual subscription for unlimited 1-year access to all 4K videos."}
+              : selectedVideoTier === "yearly"
+              ? "Annual subscription for unlimited 1-year access to all 4K videos."
+              : "Permanent one-time VIP pass for lifetime access to all 4K videos."}
           </DialogDescription>
         </DialogHeader>
 
@@ -94,7 +101,7 @@ export function SubscriptionModal({
                 variant="outline"
                 className="text-[10px] px-1 py-0 h-4 uppercase tracking-wider font-semibold shrink-0"
               >
-                {isAudioItem ? "Lifetime Audio" : "Annual Video"}
+                {isAudioItem ? "Lifetime Audio" : "4K Studio Video"}
               </Badge>
               {item.genre && (
                 <span className="text-xs text-muted-foreground truncate">
@@ -104,10 +111,10 @@ export function SubscriptionModal({
             </div>
             <div className="text-right shrink-0">
               <span className="text-base sm:text-lg font-bold text-foreground">
-                ${item.price.toFixed(2)}
+                ${isAudioItem ? item.price.toFixed(2) : selectedVideoTier === "yearly" ? "29.00" : "79.00"}
               </span>
               <span className="text-[10px] text-muted-foreground ml-1">
-                {isAudioItem ? "one-time" : "/ yr"}
+                {isAudioItem ? "one-time" : selectedVideoTier === "yearly" ? "/ yr" : "one-time"}
               </span>
             </div>
           </div>
@@ -124,13 +131,77 @@ export function SubscriptionModal({
           </div>
         </div>
 
+        {!isAudioItem && (
+          <div className="grid grid-cols-2 gap-2 sm:gap-2.5 my-2.5">
+            <button
+              type="button"
+              onClick={() => setSelectedVideoTier("yearly")}
+              className={`p-2.5 sm:p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                selectedVideoTier === "yearly"
+                  ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-xs"
+                  : "border-border/70 bg-muted/20 text-muted-foreground hover:border-border hover:text-foreground"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Yearly
+                </span>
+                <Badge
+                  variant={selectedVideoTier === "yearly" ? "default" : "outline"}
+                  className="text-[9px] sm:text-[10px] py-0 px-1 h-4"
+                >
+                  Annual
+                </Badge>
+              </div>
+              <div className="mt-1.5 flex items-baseline gap-1">
+                <span className="text-base sm:text-lg font-bold text-foreground">$29</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground">/ year</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">
+                1-year access to all videos
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedVideoTier("lifetime")}
+              className={`p-2.5 sm:p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                selectedVideoTier === "lifetime"
+                  ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-xs"
+                  : "border-border/70 bg-muted/20 text-muted-foreground hover:border-border hover:text-foreground"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Lifetime
+                </span>
+                <Badge
+                  variant={selectedVideoTier === "lifetime" ? "default" : "secondary"}
+                  className="text-[9px] sm:text-[10px] py-0 px-1 h-4"
+                >
+                  VIP
+                </Badge>
+              </div>
+              <div className="mt-1.5 flex items-baseline gap-1">
+                <span className="text-base sm:text-lg font-bold text-foreground">$79</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground">one-time</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">
+                Permanent lifetime pass
+              </p>
+            </button>
+          </div>
+        )}
+
         <div className="space-y-1.5 py-1 text-xs text-muted-foreground">
           <div className="flex items-start gap-2">
             <Check className="size-3.5 text-emerald-500 shrink-0 mt-0.5" />
             <span className="leading-tight">
               {isAudioItem
                 ? "Instant lifetime access immediately upon checkout"
-                : "Instant 1-year access to all 4K videos upon checkout"}
+                : selectedVideoTier === "yearly"
+                ? "Instant 1-year access to all 4K videos upon checkout"
+                : "Instant permanent lifetime access to all 4K videos upon checkout"}
             </span>
           </div>
           <div className="flex items-start gap-2">
