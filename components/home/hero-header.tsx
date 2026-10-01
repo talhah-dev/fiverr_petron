@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useSyncExternalStore } from "react"
+import { useState, useEffect, useSyncExternalStore } from "react"
 import Link from "next/link"
 import { useTheme } from "next-themes"
 import {
@@ -27,6 +27,8 @@ import { UserSubscription } from "./types"
 
 interface HeroHeaderProps {
   subscription: UserSubscription
+  isVideoMuted: boolean
+  onToggleVideoSound: () => void
   onOpenSubscription: () => void
   onOpenMemberModal: () => void
 }
@@ -35,10 +37,11 @@ const emptySubscribe = () => () => {}
 
 export function HeroHeader({
   subscription,
+  isVideoMuted,
+  onToggleVideoSound,
   onOpenSubscription,
   onOpenMemberModal,
 }: HeroHeaderProps) {
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false)
   const [viewCount, setViewCount] = useState(1918)
   const { resolvedTheme, setTheme } = useTheme()
 
@@ -48,62 +51,12 @@ export function HeroHeader({
     () => false
   )
 
-  const audioContextRef = useRef<AudioContext | null>(null)
-  const oscillatorRef = useRef<OscillatorNode | null>(null)
-  const gainNodeRef = useRef<GainNode | null>(null)
-
   useEffect(() => {
     const timer = setInterval(() => {
       setViewCount((prev) => prev + (Math.random() > 0.6 ? 1 : 0))
     }, 4500)
     return () => clearInterval(timer)
   }, [])
-
-  const toggleSound = () => {
-    if (!isPlayingAudio) {
-      try {
-        const AudioCtx =
-          window.AudioContext ||
-          (window as unknown as { webkitAudioContext: typeof AudioContext })
-            .webkitAudioContext
-        const ctx = new AudioCtx()
-        const osc = ctx.createOscillator()
-        const gain = ctx.createGain()
-
-        osc.type = "sine"
-        osc.frequency.setValueAtTime(164.81, ctx.currentTime)
-
-        gain.gain.setValueAtTime(0.01, ctx.currentTime)
-        gain.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 1)
-
-        osc.connect(gain)
-        gain.connect(ctx.destination)
-        osc.start()
-
-        audioContextRef.current = ctx
-        oscillatorRef.current = osc
-        gainNodeRef.current = gain
-        setIsPlayingAudio(true)
-      } catch {
-        setIsPlayingAudio(true)
-      }
-    } else {
-      if (gainNodeRef.current && audioContextRef.current) {
-        gainNodeRef.current.gain.exponentialRampToValueAtTime(
-          0.0001,
-          audioContextRef.current.currentTime + 0.5
-        )
-        setTimeout(() => {
-          oscillatorRef.current?.stop()
-          audioContextRef.current?.close()
-          audioContextRef.current = null
-          oscillatorRef.current = null
-          gainNodeRef.current = null
-        }, 500)
-      }
-      setIsPlayingAudio(false)
-    }
-  }
 
   const isSubscribed = subscription.tier !== "free"
 
@@ -112,11 +65,11 @@ export function HeroHeader({
       <div className="w-full max-w-2xl flex items-center justify-between mb-8">
         <Button
           variant="outline"
-          onClick={toggleSound}
-          aria-label={isPlayingAudio ? "Mute audio" : "Unmute audio"}
+          onClick={onToggleVideoSound}
+          aria-label={isVideoMuted ? "Unmute video sound" : "Mute video sound"}
           className="cursor-pointer rounded-full"
         >
-          {isPlayingAudio ? (
+          {!isVideoMuted ? (
             <Volume2 className="size-3.5 text-foreground animate-pulse" />
           ) : (
             <VolumeX className="size-3.5 text-muted-foreground" />
@@ -167,16 +120,17 @@ export function HeroHeader({
       </div>
 
       <div className="flex flex-col items-center text-center space-y-4 max-w-md w-full">
-        <ProfileAvatar initialName="swagsxn" size={96} />
-
-        <div className="space-y-1">
-          <div className="flex items-center justify-center gap-1.5">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              swagsxn
-            </h1>
-            <Badge variant="secondary" className="text-[10px] py-0 px-1.5 h-4">
-              PRO
-            </Badge>
+        <div className="flex flex-col items-center">
+          <ProfileAvatar initialName="swagsxn" size={96} />
+          <div className="space-y-1">
+            <div className="flex items-center justify-center gap-1.5">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                swagsxn
+              </h1>
+              <Badge variant="secondary" className="text-[10px] py-0 px-1.5 h-4">
+                PRO
+              </Badge>
+            </div>
           </div>
         </div>
 
@@ -184,49 +138,49 @@ export function HeroHeader({
           <Link
             href="mailto:contact@swagsxn.art"
             aria-label="Email"
-            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50"
+            className="p-2.5 rounded-full text-foreground hover:opacity-75 dark:text-muted-foreground dark:hover:text-foreground transition-all hover:bg-muted/50"
           >
-            <FaEnvelope className="size-4" />
+            <FaEnvelope className="size-5" />
           </Link>
           <Link
             href="https://youtube.com"
             target="_blank"
             rel="noreferrer"
             aria-label="YouTube"
-            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50"
+            className="p-2.5 rounded-full text-foreground hover:opacity-75 dark:text-muted-foreground dark:hover:text-foreground transition-all hover:bg-muted/50"
           >
-            <FaYoutube className="size-4" />
+            <FaYoutube className="size-5" />
           </Link>
           <Link
             href="https://instagram.com"
             target="_blank"
             rel="noreferrer"
             aria-label="Instagram"
-            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50"
+            className="p-2.5 rounded-full text-foreground hover:opacity-75 dark:text-muted-foreground dark:hover:text-foreground transition-all hover:bg-muted/50"
           >
-            <FaInstagram className="size-4" />
+            <FaInstagram className="size-5" />
           </Link>
           <Link
             href="https://tiktok.com"
             target="_blank"
             rel="noreferrer"
             aria-label="TikTok"
-            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50"
+            className="p-2.5 rounded-full text-foreground hover:opacity-75 dark:text-muted-foreground dark:hover:text-foreground transition-all hover:bg-muted/50"
           >
-            <FaTiktok className="size-4" />
+            <FaTiktok className="size-5" />
           </Link>
           <Link
             href="https://spotify.com"
             target="_blank"
             rel="noreferrer"
             aria-label="Spotify"
-            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50"
+            className="p-2.5 rounded-full text-foreground hover:opacity-75 dark:text-muted-foreground dark:hover:text-foreground transition-all hover:bg-muted/50"
           >
-            <FaSpotify className="size-4" />
+            <FaSpotify className="size-5" />
           </Link>
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-0.5">
+        <div className="flex items-center gap-1.5 text-xs text-foreground dark:text-muted-foreground font-medium pt-0.5">
           <Eye className="size-3.5" />
           <span className="font-mono">{viewCount.toLocaleString()}</span>
           <span>views</span>
@@ -239,7 +193,7 @@ export function HeroHeader({
               size="default"
               className="gap-1.5 px-6 font-medium shadow-none cursor-pointer"
             >
-              <Sparkles className="size-4" />
+              <Sparkles className="size-5" />
               Subscribe & Unlock
             </Button>
           ) : (

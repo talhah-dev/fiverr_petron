@@ -41,43 +41,43 @@ export function MediaCatalog({
 
   return (
     <section id="media-catalog-section" className="w-full max-w-2xl px-4 pb-24">
-      <div className="flex items-center justify-between pb-3 border-b border-border/40 mb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/40 mb-3">
         <div>
           <h2 className="text-base font-semibold tracking-tight text-foreground">
             Exclusive Vault
           </h2>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-foreground/80 dark:text-muted-foreground">
             Songs, videos & unreleased audio
           </p>
         </div>
 
-        <div className="flex items-center p-0.5 bg-muted/60 rounded-lg text-xs">
+        <div className="grid grid-cols-3 sm:inline-flex items-center p-0.5 bg-muted/60 rounded-lg text-xs w-full sm:w-auto shrink-0">
           <button
             onClick={() => setFilter("all")}
-            className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md transition-all text-center whitespace-nowrap cursor-pointer ${
               filter === "all"
-                ? "bg-background text-foreground shadow-xs"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-background text-foreground shadow-xs font-medium"
+                : "text-foreground/75 dark:text-muted-foreground hover:text-foreground"
             }`}
           >
-            All ({items.length})
+            All
           </button>
           <button
             onClick={() => setFilter("song")}
-            className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md transition-all text-center whitespace-nowrap cursor-pointer ${
               filter === "song"
-                ? "bg-background text-foreground shadow-xs"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-background text-foreground shadow-xs font-medium"
+                : "text-foreground/75 dark:text-muted-foreground hover:text-foreground"
             }`}
           >
             Songs
           </button>
           <button
             onClick={() => setFilter("video")}
-            className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md transition-all text-center whitespace-nowrap cursor-pointer ${
               filter === "video"
-                ? "bg-background text-foreground shadow-xs"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-background text-foreground shadow-xs font-medium"
+                : "text-foreground/75 dark:text-muted-foreground hover:text-foreground"
             }`}
           >
             Videos
@@ -126,7 +126,7 @@ export function MediaCatalog({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-2 text-xs text-foreground/80 dark:text-muted-foreground">
                       <span className="flex items-center gap-1">
                         {item.type === "song" ? (
                           <Music className="size-3" />
@@ -153,7 +153,7 @@ export function MediaCatalog({
                       variant="ghost"
                       size="sm"
                       onClick={() => onTogglePlay(item)}
-                      className="text-xs gap-1.5 text-muted-foreground hover:text-foreground cursor-pointer"
+                      className="text-xs gap-1.5 text-foreground/80 hover:text-foreground cursor-pointer"
                     >
                       <Download className="size-3.5" />
                       <span className="hidden sm:inline">Stream</span>
@@ -165,7 +165,7 @@ export function MediaCatalog({
                       onClick={onOpenSubscription}
                       className="text-xs gap-1.5 h-8 border-border/80 hover:bg-muted/80 cursor-pointer"
                     >
-                      <Lock className="size-3 text-muted-foreground" />
+                      <Lock className="size-3 text-foreground/70 dark:text-muted-foreground" />
                       <span>Unlock</span>
                     </Button>
                   )}
@@ -185,7 +185,7 @@ export function MediaCatalog({
             <h3 className="text-sm font-medium text-foreground">
               Unlock Full Vault
             </h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-xs text-foreground/80 dark:text-muted-foreground mt-0.5">
               Instant streaming for all songs and 4K videos.
             </p>
           </div>

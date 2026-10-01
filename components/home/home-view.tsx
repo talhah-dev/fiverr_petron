@@ -22,9 +22,25 @@ export function HomeView() {
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false)
   const [activeItem, setActiveItem] = useState<MediaItem | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [isVideoMuted, setIsVideoMuted] = useState(true)
 
+  const videoRef = useRef<HTMLVideoElement | null>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
   const oscRef = useRef<OscillatorNode | null>(null)
+
+  const handleToggleVideoSound = () => {
+    const video = videoRef.current
+    if (!video) return
+
+    if (isVideoMuted) {
+      video.muted = false
+      video.play().catch(() => {})
+      setIsVideoMuted(false)
+    } else {
+      video.muted = true
+      setIsVideoMuted(true)
+    }
+  }
 
   const stopPreviewAudio = () => {
     if (oscRef.current && audioCtxRef.current) {
@@ -68,6 +84,10 @@ export function HomeView() {
     } else {
       setActiveItem(item)
       setIsPlaying(true)
+      if (videoRef.current) {
+        videoRef.current.muted = true
+        setIsVideoMuted(true)
+      }
       const freq = item.type === "song" ? 220 : 330
       startPreviewAudio(freq)
     }
@@ -129,11 +149,13 @@ export function HomeView() {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center">
-      <VideoBackground />
+      <VideoBackground ref={videoRef} isMuted={isVideoMuted} />
 
       <main className="w-full flex flex-col items-center z-10">
         <HeroHeader
           subscription={subscription}
+          isVideoMuted={isVideoMuted}
+          onToggleVideoSound={handleToggleVideoSound}
           onOpenSubscription={() => setIsSubscriptionModalOpen(true)}
           onOpenMemberModal={() => setIsMemberModalOpen(true)}
         />
@@ -157,6 +179,10 @@ export function HomeView() {
             stopPreviewAudio()
           } else if (activeItem) {
             setIsPlaying(true)
+            if (videoRef.current) {
+              videoRef.current.muted = true
+              setIsVideoMuted(true)
+            }
             startPreviewAudio(activeItem.type === "song" ? 220 : 330)
           }
         }}

@@ -51,11 +51,11 @@ export function ProfileAvatar({
       </div>
 
       <Button
-        variant="outline"
+        variant="secondary"
         size="icon-xs"
         onClick={handleShuffle}
         aria-label="Shuffle avatar"
-        className="absolute -top-1 -right-1 size-6 rounded-full bg-background/90 backdrop-blur-sm shadow-xs border-border/80 hover:bg-muted cursor-pointer"
+        className="absolute -top-1 -right-1 size-6  cursor-pointer"
       >
         <Shuffle
           className={`size-3 text-muted-foreground transition-transform duration-300 ${
