@@ -102,7 +102,7 @@ export function HomeView() {
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col">
+    <div className="relative min-h-screen flex flex-col w-full overflow-x-hidden">
       <VideoBackground />
 
       <HeroHeader
@@ -112,7 +112,7 @@ export function HomeView() {
 
       <main
         id="vault-section"
-        className="relative z-10 w-full bg-background border-t border-border/40 flex flex-col items-center pt-10"
+        className="relative z-10 w-full min-w-full bg-background border-t border-border/40 flex flex-col items-center pt-8 sm:pt-10 overflow-x-hidden"
       >
         <MediaCatalog
           items={INITIAL_MEDIA_ITEMS}

@@ -77,9 +77,9 @@ export function SubscriptionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md p-6 bg-card border-border/80 shadow-lg">
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-md p-4 sm:p-6 bg-card border-border/80 shadow-lg rounded-xl">
         <DialogHeader className="space-y-1 text-left">
-          <DialogTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
+          <DialogTitle className="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2">
             {isAudioItem ? (
               <>
                 <Music className="size-5 text-primary" />
@@ -104,7 +104,7 @@ export function SubscriptionModal({
         </DialogHeader>
 
         {item ? (
-          <div className="p-3.5 my-3 rounded-lg border border-border/80 bg-muted/20 flex items-center justify-between gap-3">
+          <div className="p-3 sm:p-3.5 my-2.5 sm:my-3 rounded-lg border border-border/80 bg-muted/20 flex items-center justify-between gap-2.5 sm:gap-3">
             <div className="min-w-0 space-y-0.5">
               <div className="flex items-center gap-1.5">
                 <Badge
@@ -129,7 +129,7 @@ export function SubscriptionModal({
               </p>
             </div>
             <div className="text-right shrink-0">
-              <p className="text-xl font-bold text-foreground">
+              <p className="text-lg sm:text-xl font-bold text-foreground">
                 ${item.price.toFixed(2)}
               </p>
               <p className="text-[10px] text-muted-foreground">
@@ -209,7 +209,7 @@ export function SubscriptionModal({
             size="lg"
             disabled={isProcessing}
             onClick={() => handleSimulatePayment("apple")}
-            className="w-full h-11 bg-foreground text-background hover:bg-foreground/90 font-medium text-sm flex items-center justify-center gap-2 rounded-lg cursor-pointer"
+            className="w-full h-10 sm:h-11 bg-foreground text-background hover:bg-foreground/90 font-medium text-xs sm:text-sm flex items-center justify-center gap-2 rounded-lg cursor-pointer"
           >
             {isProcessing && activePaymentMethod === "apple" ? (
               <>
@@ -230,7 +230,7 @@ export function SubscriptionModal({
             size="lg"
             disabled={isProcessing}
             onClick={() => handleSimulatePayment("google")}
-            className="w-full h-11 border-border/80 hover:bg-muted font-medium text-sm flex items-center justify-center gap-2 rounded-lg cursor-pointer"
+            className="w-full h-10 sm:h-11 border-border/80 hover:bg-muted font-medium text-xs sm:text-sm flex items-center justify-center gap-2 rounded-lg cursor-pointer"
           >
             {isProcessing && activePaymentMethod === "google" ? (
               <>
