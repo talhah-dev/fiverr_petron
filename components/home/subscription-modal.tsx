@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Check, Loader2 } from "lucide-react"
+import { Check, Loader2, Sparkles, ShoppingBag } from "lucide-react"
 import { FaApple, FaGoogle } from "react-icons/fa6"
 import {
   Dialog,
@@ -12,22 +12,31 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { SubscriptionTier } from "./types"
+import { MediaItem, SubscriptionTier } from "./types"
 
 interface SubscriptionModalProps {
   isOpen: boolean
   onClose: () => void
-  onSuccessfulSubscription: (tier: SubscriptionTier, email: string) => void
+  item?: MediaItem | null
+  onSuccessfulSubscription: (
+    tier: SubscriptionTier,
+    email: string,
+    itemId?: string
+  ) => void
 }
 
 export function SubscriptionModal({
   isOpen,
   onClose,
+  item,
   onSuccessfulSubscription,
 }: SubscriptionModalProps) {
   const [selectedTier, setSelectedTier] = useState<"yearly" | "lifetime">("yearly")
   const [isProcessing, setIsProcessing] = useState(false)
   const [activePaymentMethod, setActivePaymentMethod] = useState<string | null>(null)
+
+  const isAudioItem = item?.type === "song"
+  const isVideoItem = item?.type === "video"
 
   const handleSimulatePayment = (method: string) => {
     setActivePaymentMethod(method)
@@ -40,102 +49,137 @@ export function SubscriptionModal({
         method === "apple"
           ? "customer@icloud.com"
           : "customer@gmail.com"
-      onSuccessfulSubscription(selectedTier, mockEmail)
+      const tier: SubscriptionTier = isAudioItem
+        ? "lifetime"
+        : isVideoItem
+        ? "yearly"
+        : selectedTier
+      onSuccessfulSubscription(tier, mockEmail, item?.id)
       onClose()
-    }, 1200)
+    }, 1000)
   }
-
-  const yearlyPerks = [
-    "Full access to all songs & 4K videos",
-    "Active for 365 days, cancel anytime",
-  ]
-
-  const lifetimePerks = [
-    "Lifetime VIP access to all songs & videos",
-    "All future releases included, never pay again",
-  ]
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md p-6 bg-card border-border/80 shadow-lg">
         <DialogHeader className="space-y-1 text-left">
-          <DialogTitle className="text-xl font-bold tracking-tight">
-            Unlock Creator Vault
+          <DialogTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
+            {isAudioItem ? (
+              <>
+                <ShoppingBag className="size-5 text-primary" />
+                <span>Buy Audio • Lifetime Access</span>
+              </>
+            ) : isVideoItem ? (
+              <>
+                <Sparkles className="size-5 text-primary" />
+                <span>Subscribe to Video Vault</span>
+              </>
+            ) : (
+              <span>Unlock Creator Vault</span>
+            )}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Instant streaming access to all unreleased songs and videos.
+            {isAudioItem
+              ? "One-time purchase for permanent streaming and stems access."
+              : isVideoItem
+              ? "Annual subscription for unlimited 4K video streaming access."
+              : "Instant streaming access to all unreleased songs and videos."}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-2.5 my-3">
-          <button
-            type="button"
-            onClick={() => setSelectedTier("yearly")}
-            className={`p-3 rounded-lg border text-left transition-all ${
-              selectedTier === "yearly"
-                ? "border-primary bg-primary/5 text-foreground ring-1 ring-primary/30"
-                : "border-border/60 bg-muted/20 text-muted-foreground hover:border-border"
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider">
-                Yearly
-              </span>
-              <Badge variant="outline" className="text-[10px] py-0 px-1 h-4">
-                Popular
-              </Badge>
-            </div>
-            <div className="mt-2">
-              <span className="text-xl font-bold text-foreground">$29</span>
-              <span className="text-xs text-muted-foreground"> / year</span>
-            </div>
-            <p className="text-[11px] text-muted-foreground mt-1">
-              Billed annually
-            </p>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setSelectedTier("lifetime")}
-            className={`p-3 rounded-lg border text-left transition-all ${
-              selectedTier === "lifetime"
-                ? "border-primary bg-primary/5 text-foreground ring-1 ring-primary/30"
-                : "border-border/60 bg-muted/20 text-muted-foreground hover:border-border"
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider">
-                Lifetime
-              </span>
-              <Badge variant="secondary" className="text-[10px] py-0 px-1 h-4">
-                VIP
-              </Badge>
-            </div>
-            <div className="mt-2">
-              <span className="text-xl font-bold text-foreground">$79</span>
-              <span className="text-xs text-muted-foreground"> one-time</span>
-            </div>
-            <p className="text-[11px] text-muted-foreground mt-1">
-              Permanent access
-            </p>
-          </button>
-        </div>
-
-        <div className="space-y-1.5 py-1">
-          <p className="text-xs font-medium text-foreground">
-            What is included:
-          </p>
-          {(selectedTier === "yearly" ? yearlyPerks : lifetimePerks).map(
-            (perk, idx) => (
-              <div
-                key={idx}
-                className="flex items-start gap-2 text-xs text-muted-foreground"
-              >
-                <Check className="size-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                <span>{perk}</span>
+        {item ? (
+          <div className="p-3.5 my-3 rounded-lg border border-border/80 bg-muted/20 flex items-center justify-between gap-3">
+            <div className="min-w-0 space-y-0.5">
+              <div className="flex items-center gap-1.5">
+                <Badge
+                  variant="outline"
+                  className="text-[10px] px-1 py-0 h-4 uppercase tracking-wider font-semibold"
+                >
+                  {isAudioItem ? "Lifetime Audio" : "Annual VIP"}
+                </Badge>
+                {item.genre && (
+                  <span className="text-xs text-muted-foreground truncate">
+                    {item.genre}
+                  </span>
+                )}
               </div>
-            )
-          )}
+              <p className="text-sm font-semibold text-foreground truncate">
+                {item.title}
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                {isAudioItem
+                  ? "Instant MP3/WAV download & stream"
+                  : "All current and upcoming 4K videos included"}
+              </p>
+            </div>
+            <div className="text-right shrink-0">
+              <p className="text-xl font-bold text-foreground">
+                ${item.price.toFixed(2)}
+              </p>
+              <p className="text-[10px] text-muted-foreground">
+                {isAudioItem ? "one-time" : "/ year"}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-2.5 my-3">
+            <button
+              type="button"
+              onClick={() => setSelectedTier("yearly")}
+              className={`p-3 rounded-lg border text-left transition-all ${
+                selectedTier === "yearly"
+                  ? "border-primary bg-primary/5 text-foreground ring-1 ring-primary/30"
+                  : "border-border/60 bg-muted/20 text-muted-foreground hover:border-border"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider">
+                  Yearly
+                </span>
+                <Badge variant="outline" className="text-[10px] py-0 px-1 h-4">
+                  Videos
+                </Badge>
+              </div>
+              <div className="mt-2">
+                <span className="text-xl font-bold text-foreground">$29</span>
+                <span className="text-xs text-muted-foreground"> / year</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedTier("lifetime")}
+              className={`p-3 rounded-lg border text-left transition-all ${
+                selectedTier === "lifetime"
+                  ? "border-primary bg-primary/5 text-foreground ring-1 ring-primary/30"
+                  : "border-border/60 bg-muted/20 text-muted-foreground hover:border-border"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider">
+                  Lifetime
+                </span>
+                <Badge variant="secondary" className="text-[10px] py-0 px-1 h-4">
+                  VIP
+                </Badge>
+              </div>
+              <div className="mt-2">
+                <span className="text-xl font-bold text-foreground">$79</span>
+                <span className="text-xs text-muted-foreground"> one-time</span>
+              </div>
+            </button>
+          </div>
+        )}
+
+        <div className="space-y-1.5 py-1 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <Check className="size-3.5 text-emerald-500 shrink-0" />
+            <span>Instant access immediately upon checkout</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="size-3.5 text-emerald-500 shrink-0" />
+            <span>Encrypted 256-bit secure transaction</span>
+          </div>
         </div>
 
         <div className="space-y-2 pt-3 border-t border-border/60">
@@ -182,7 +226,7 @@ export function SubscriptionModal({
           </Button>
         </div>
 
-        <p className="pt-2 text-[11px] text-muted-foreground/80 text-center">
+        <p className="pt-1 text-[11px] text-muted-foreground/80 text-center">
           Account created automatically with payment email
         </p>
       </DialogContent>

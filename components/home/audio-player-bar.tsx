@@ -35,8 +35,13 @@ export function AudioPlayerBar({
 
   if (!item) return null
 
-  const isSubscribed = subscription.tier !== "free"
-  const isPreview = item.isExclusive && !isSubscribed
+  const isPurchased = (subscription.purchasedItemIds ?? []).includes(item.id)
+  const isUnlocked =
+    !item.isExclusive ||
+    subscription.tier === "lifetime" ||
+    (item.type === "video" && subscription.tier === "yearly") ||
+    isPurchased
+  const isPreview = !isUnlocked
 
   return (
     <div className="fixed bottom-4 inset-x-0 mx-auto max-w-xl px-4 z-40 animate-in fade-in slide-in-from-bottom-3 duration-200">
@@ -63,14 +68,14 @@ export function AudioPlayerBar({
               </p>
               {isPreview ? (
                 <Badge variant="outline" className="text-[9px] px-1 py-0 h-3.5">
-                  30s Teaser
+                  Preview
                 </Badge>
               ) : (
                 <Badge
                   variant="secondary"
                   className="text-[9px] px-1 py-0 h-3.5 text-emerald-500"
                 >
-                  Full Audio
+                  Unlocked
                 </Badge>
               )}
             </div>
@@ -98,7 +103,7 @@ export function AudioPlayerBar({
               className="text-xs h-7 gap-1 border-border/80"
             >
               <Lock className="size-3" />
-              <span>Unlock Full</span>
+              <span>{item.type === "song" ? "Buy $29" : "Subscribe"}</span>
             </Button>
           )}
 

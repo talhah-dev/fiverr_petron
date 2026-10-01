@@ -8,6 +8,9 @@ export interface MediaItem {
   releaseDate: string
   isExclusive: boolean
   genre?: string
+  bpm?: string
+  tags?: string[]
+  price: number
   thumbnailUrl?: string
 }
 
@@ -18,4 +21,6 @@ export interface UserSubscription {
   email: string | null
   activeUntil: string | null
   autoRenew: boolean
+  purchasedItemIds?: string[]
 }
+

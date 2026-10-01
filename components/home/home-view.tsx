@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { VideoBackground } from "./video-background"
 import { HeroHeader } from "./hero-header"
 import { MediaCatalog } from "./media-catalog"
@@ -19,14 +19,71 @@ export function HomeView() {
   })
 
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false)
+  const [selectedPaymentItem, setSelectedPaymentItem] = useState<MediaItem | null>(null)
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false)
   const [activeItem, setActiveItem] = useState<MediaItem | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [isVideoMuted, setIsVideoMuted] = useState(true)
+  const [isVideoMuted, setIsVideoMuted] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
   const oscRef = useRef<OscillatorNode | null>(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    video.volume = 1.0
+
+    const tryPlayWithSound = () => {
+      video.muted = false
+      const promise = video.play()
+      if (promise !== undefined) {
+        promise
+          .then(() => {
+            setIsVideoMuted(false)
+          })
+          .catch(() => {
+            video.muted = true
+            video.play().catch(() => {})
+            setIsVideoMuted(true)
+          })
+      }
+    }
+
+    tryPlayWithSound()
+
+    const enableAudio = () => {
+      if (videoRef.current) {
+        videoRef.current.muted = false
+        videoRef.current.volume = 1.0
+        videoRef.current.play().catch(() => {})
+        setIsVideoMuted(false)
+      }
+      window.removeEventListener("pointerdown", enableAudio)
+      window.removeEventListener("click", enableAudio)
+      window.removeEventListener("scroll", enableAudio)
+      window.removeEventListener("touchstart", enableAudio)
+      window.removeEventListener("keydown", enableAudio)
+    }
+
+    window.addEventListener("pointerdown", enableAudio, { once: true })
+    window.addEventListener("click", enableAudio, { once: true })
+    window.addEventListener("scroll", enableAudio, { once: true })
+    window.addEventListener("touchstart", enableAudio, { once: true })
+    window.addEventListener("keydown", enableAudio, { once: true })
+
+    video.addEventListener("canplay", tryPlayWithSound, { once: true })
+
+    return () => {
+      window.removeEventListener("pointerdown", enableAudio)
+      window.removeEventListener("click", enableAudio)
+      window.removeEventListener("scroll", enableAudio)
+      window.removeEventListener("touchstart", enableAudio)
+      window.removeEventListener("keydown", enableAudio)
+      video.removeEventListener("canplay", tryPlayWithSound)
+    }
+  }, [])
 
   const handleToggleVideoSound = () => {
     const video = videoRef.current
@@ -34,6 +91,7 @@ export function HomeView() {
 
     if (isVideoMuted) {
       video.muted = false
+      video.volume = 1.0
       video.play().catch(() => {})
       setIsVideoMuted(false)
     } else {
@@ -93,25 +151,39 @@ export function HomeView() {
     }
   }
 
+  const handleOpenPayment = (item: MediaItem) => {
+    setSelectedPaymentItem(item)
+    setIsSubscriptionModalOpen(true)
+  }
+
   const handleSuccessfulSubscription = (
     tier: SubscriptionTier,
-    email: string
+    email: string,
+    itemId?: string
   ) => {
     const nextYear = new Date()
     nextYear.setFullYear(nextYear.getFullYear() + 1)
 
-    setSubscription({
-      tier,
-      email,
-      activeUntil:
-        tier === "yearly"
-          ? nextYear.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })
-          : null,
-      autoRenew: tier === "yearly",
+    setSubscription((prev) => {
+      const updatedPurchased = itemId
+        ? Array.from(new Set([...(prev.purchasedItemIds ?? []), itemId]))
+        : prev.purchasedItemIds
+
+      return {
+        ...prev,
+        tier: tier !== "free" ? tier : prev.tier,
+        email,
+        activeUntil:
+          tier === "yearly"
+            ? nextYear.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })
+            : prev.activeUntil,
+        autoRenew: tier === "yearly",
+        purchasedItemIds: updatedPurchased,
+      }
     })
   }
 
@@ -148,24 +220,26 @@ export function HomeView() {
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center">
+    <div className="relative min-h-screen flex flex-col">
       <VideoBackground ref={videoRef} isMuted={isVideoMuted} />
 
-      <main className="w-full flex flex-col items-center z-10">
-        <HeroHeader
-          subscription={subscription}
-          isVideoMuted={isVideoMuted}
-          onToggleVideoSound={handleToggleVideoSound}
-          onOpenSubscription={() => setIsSubscriptionModalOpen(true)}
-          onOpenMemberModal={() => setIsMemberModalOpen(true)}
-        />
+      <HeroHeader
+        subscription={subscription}
+        isVideoMuted={isVideoMuted}
+        onToggleVideoSound={handleToggleVideoSound}
+        onOpenMemberModal={() => setIsMemberModalOpen(true)}
+      />
 
+      <main
+        id="vault-section"
+        className="relative z-10 w-full bg-background border-t border-border/40 flex flex-col items-center pt-10"
+      >
         <MediaCatalog
           items={INITIAL_MEDIA_ITEMS}
           subscription={subscription}
           activePlayingId={isPlaying ? activeItem?.id ?? null : null}
           onTogglePlay={handleTogglePlay}
-          onOpenSubscription={() => setIsSubscriptionModalOpen(true)}
+          onOpenPayment={handleOpenPayment}
         />
       </main>
 
@@ -191,12 +265,22 @@ export function HomeView() {
           setActiveItem(null)
           stopPreviewAudio()
         }}
-        onOpenSubscription={() => setIsSubscriptionModalOpen(true)}
+        onOpenSubscription={() => {
+          if (activeItem) {
+            handleOpenPayment(activeItem)
+          } else {
+            setIsSubscriptionModalOpen(true)
+          }
+        }}
       />
 
       <SubscriptionModal
         isOpen={isSubscriptionModalOpen}
-        onClose={() => setIsSubscriptionModalOpen(false)}
+        onClose={() => {
+          setIsSubscriptionModalOpen(false)
+          setSelectedPaymentItem(null)
+        }}
+        item={selectedPaymentItem}
         onSuccessfulSubscription={handleSuccessfulSubscription}
       />
 
