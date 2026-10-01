@@ -1,38 +1,27 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { forwardRef } from "react"
 
 interface VideoBackgroundProps {
-  videoUrl?: string
+  isMuted?: boolean
 }
 
-export function VideoBackground({
-  videoUrl = "/video.mp4",
-}: VideoBackgroundProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null)
-
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    video.muted = false
-    video.volume = 1.0
-    video.play().catch(() => {})
-  }, [])
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-      <video
-        ref={videoRef}
-        autoPlay
-        loop
-        playsInline
-        preload="auto"
-        src={videoUrl}
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-    </div>
-  )
-}
-
-
+export const VideoBackground = forwardRef<HTMLVideoElement, VideoBackgroundProps>(
+  function VideoBackground({ isMuted = true }, ref) {
+    return (
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <video
+          ref={ref}
+          autoPlay
+          loop
+          muted={isMuted}
+          playsInline
+          preload="auto"
+          className="absolute inset-0 h-full w-full object-cover"
+        >
+          <source src="/video.mp4" type="video/mp4" />
+        </video>
+      </div>
+    )
+  }
+)

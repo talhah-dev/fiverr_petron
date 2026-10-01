@@ -7,6 +7,8 @@ import {
   CheckCircle2,
   User,
   ChevronDown,
+  Volume2,
+  VolumeX,
 } from "lucide-react"
 import {
   FaYoutube,
@@ -22,11 +24,15 @@ import { UserSubscription } from "./types"
 
 interface HeroHeaderProps {
   subscription: UserSubscription
+  isMuted: boolean
+  onToggleMute: () => void
   onOpenMemberModal: () => void
 }
 
 export function HeroHeader({
   subscription,
+  isMuted,
+  onToggleMute,
   onOpenMemberModal,
 }: HeroHeaderProps) {
   const [viewCount, setViewCount] = useState(1918)
@@ -42,7 +48,21 @@ export function HeroHeader({
 
   return (
     <header className="relative w-full min-h-[100dvh] flex flex-col justify-between items-center px-4 pt-6 pb-6 z-10">
-      <div className="w-full max-w-2xl flex items-center justify-end">
+      <div className="w-full max-w-2xl flex items-center justify-between">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={onToggleMute}
+          aria-label={isMuted ? "Unmute video sound" : "Mute video sound"}
+          className="size-8.5 rounded-full cursor-pointer bg-black/40 hover:bg-black/60 border-white/20 text-white backdrop-blur-md shadow-xs flex items-center justify-center transition-all"
+        >
+          {isMuted ? (
+            <VolumeX className="size-3.5 text-white/80" />
+          ) : (
+            <Volume2 className="size-3.5 text-white/80" />
+          )}
+        </Button>
+
         <div className="flex items-center gap-2">
           {isSubscribed ? (
             <Button

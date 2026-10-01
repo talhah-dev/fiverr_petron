@@ -36,11 +36,7 @@ export function AudioPlayerBar({
   if (!item) return null
 
   const isPurchased = (subscription.purchasedItemIds ?? []).includes(item.id)
-  const isUnlocked =
-    !item.isExclusive ||
-    subscription.tier === "lifetime" ||
-    (item.type === "video" && subscription.tier === "yearly") ||
-    isPurchased
+  const isUnlocked = !item.isExclusive || isPurchased
   const isPreview = !isUnlocked
 
   return (

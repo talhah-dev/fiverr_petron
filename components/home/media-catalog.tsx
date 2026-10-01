@@ -91,11 +91,7 @@ export function MediaCatalog({
         {filteredItems.map((item, index) => {
           const isPlaying = activePlayingId === item.id
           const isPurchased = (subscription.purchasedItemIds ?? []).includes(item.id)
-          const isUnlocked =
-            !item.isExclusive ||
-            subscription.tier === "lifetime" ||
-            (item.type === "video" && subscription.tier === "yearly") ||
-            isPurchased
+          const isUnlocked = !item.isExclusive || isPurchased
 
           const isAudio = item.type === "song"
 

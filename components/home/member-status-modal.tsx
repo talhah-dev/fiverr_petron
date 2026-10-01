@@ -18,7 +18,6 @@ interface MemberStatusModalProps {
   isOpen: boolean
   onClose: () => void
   subscription: UserSubscription
-  onUpdateSubscription: (updates: Partial<UserSubscription>) => void
   onSignInMock: (email: string, tier: SubscriptionTier) => void
   onSignOut: () => void
 }
@@ -27,7 +26,6 @@ export function MemberStatusModal({
   isOpen,
   onClose,
   subscription,
-  onUpdateSubscription,
   onSignInMock,
   onSignOut,
 }: MemberStatusModalProps) {
@@ -41,10 +39,6 @@ export function MemberStatusModal({
     if (!inputEmail.trim()) return
     onSignInMock(inputEmail.trim(), selectedDemoTier)
     onClose()
-  }
-
-  const handleToggleAutoRenew = () => {
-    onUpdateSubscription({ autoRenew: !subscription.autoRenew })
   }
 
   return (
@@ -93,39 +87,14 @@ export function MemberStatusModal({
               </div>
 
               {subscription.tier === "yearly" && (
-                <div className="flex items-center justify-between text-xs pt-1 border-t border-border/40">
+                <div className="flex items-center justify-between text-xs pt-1.5 border-t border-border/40">
                   <span className="text-muted-foreground">Auto Renewal</span>
-                  <span
-                    className={
-                      subscription.autoRenew
-                        ? "text-emerald-500 font-medium"
-                        : "text-amber-500 font-medium"
-                    }
-                  >
-                    {subscription.autoRenew ? "Enabled" : "Cancelled (Access Active)"}
+                  <span className="text-emerald-500 font-medium">
+                    Enabled
                   </span>
                 </div>
               )}
             </div>
-
-            {subscription.tier === "yearly" && (
-              <div className="space-y-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleToggleAutoRenew}
-                  className="w-full text-xs h-8 cursor-pointer"
-                >
-                  {subscription.autoRenew
-                    ? "Cancel Yearly Renewal"
-                    : "Resume Yearly Renewal"}
-                </Button>
-                <p className="text-[10px] text-muted-foreground text-center">
-                  Canceling stops future charges while keeping full access for
-                  the remaining year.
-                </p>
-              </div>
-            )}
 
             <Button
               variant="ghost"
@@ -137,7 +106,7 @@ export function MemberStatusModal({
               className="w-full text-xs text-muted-foreground hover:text-destructive h-8 gap-1.5 cursor-pointer"
             >
               <LogOut className="size-3.5" />
-              Sign Out (Switch to Guest Mode)
+              <span>Sign Out</span>
             </Button>
           </div>
         ) : (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { VideoBackground } from "./video-background"
 import { HeroHeader } from "./hero-header"
 import { MediaCatalog } from "./media-catalog"
@@ -23,6 +23,23 @@ export function HomeView() {
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false)
   const [activeItem, setActiveItem] = useState<MediaItem | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [isMuted, setIsMuted] = useState(true)
+
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+
+  const handleToggleMute = () => {
+    if (videoRef.current) {
+      if (isMuted) {
+        videoRef.current.muted = false
+        videoRef.current.volume = 1.0
+        videoRef.current.play().catch(() => {})
+        setIsMuted(false)
+      } else {
+        videoRef.current.muted = true
+        setIsMuted(true)
+      }
+    }
+  }
 
   const handleTogglePlay = (item: MediaItem) => {
     if (activeItem?.id === item.id && isPlaying) {
@@ -30,6 +47,10 @@ export function HomeView() {
     } else {
       setActiveItem(item)
       setIsPlaying(true)
+      if (videoRef.current) {
+        videoRef.current.muted = true
+        setIsMuted(true)
+      }
     }
   }
 
@@ -69,10 +90,6 @@ export function HomeView() {
     })
   }
 
-  const handleUpdateSubscription = (updates: Partial<UserSubscription>) => {
-    setSubscription((prev) => ({ ...prev, ...updates }))
-  }
-
   const handleSignInMock = (email: string, tier: SubscriptionTier) => {
     const nextYear = new Date()
     nextYear.setFullYear(nextYear.getFullYear() + 1)
@@ -103,10 +120,12 @@ export function HomeView() {
 
   return (
     <div className="relative min-h-screen flex flex-col w-full overflow-x-hidden">
-      <VideoBackground />
+      <VideoBackground ref={videoRef} isMuted={isMuted} />
 
       <HeroHeader
         subscription={subscription}
+        isMuted={isMuted}
+        onToggleMute={handleToggleMute}
         onOpenMemberModal={() => setIsMemberModalOpen(true)}
       />
 
@@ -155,7 +174,6 @@ export function HomeView() {
         isOpen={isMemberModalOpen}
         onClose={() => setIsMemberModalOpen(false)}
         subscription={subscription}
-        onUpdateSubscription={handleUpdateSubscription}
         onSignInMock={handleSignInMock}
         onSignOut={handleSignOut}
       />
