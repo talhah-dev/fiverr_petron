@@ -49,12 +49,12 @@ export function MemberStatusModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md p-6 bg-card border-border/80 shadow-lg">
-        <DialogHeader className="space-y-1 text-left">
-          <DialogTitle className="text-lg font-bold tracking-tight">
+      <DialogContent className="w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] sm:max-w-md p-4 sm:p-6 bg-card border-border/80 shadow-lg rounded-xl overflow-hidden box-border">
+        <DialogHeader className="space-y-1 text-left pr-7 min-w-0">
+          <DialogTitle className="text-base sm:text-lg font-bold tracking-tight">
             {isSubscribed ? "Member Account & Access" : "Customer Sign In"}
           </DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground">
+          <DialogDescription className="text-xs text-muted-foreground leading-normal">
             {isSubscribed
               ? "Manage your active subscription and playback permissions."
               : "Enter your payment email to restore your yearly or lifetime access."}

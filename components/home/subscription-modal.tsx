@@ -77,24 +77,24 @@ export function SubscriptionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-[calc(100vw-2rem)] max-w-md p-4 sm:p-6 bg-card border-border/80 shadow-lg rounded-xl">
-        <DialogHeader className="space-y-1 text-left">
-          <DialogTitle className="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2">
+      <DialogContent className="w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] sm:max-w-md p-4 sm:p-6 bg-card border-border/80 shadow-lg rounded-xl overflow-hidden box-border">
+        <DialogHeader className="space-y-1 text-left pr-7 min-w-0">
+          <DialogTitle className="text-base sm:text-lg font-bold tracking-tight flex items-center gap-2 min-w-0">
             {isAudioItem ? (
               <>
-                <Music className="size-5 text-primary" />
-                <span>Buy Audio • Lifetime Access</span>
+                <Music className="size-4.5 text-primary shrink-0" />
+                <span className="truncate">Buy Audio • Lifetime Access</span>
               </>
             ) : isVideoItem ? (
               <>
-                <Film className="size-5 text-primary" />
-                <span>Subscribe to Video Vault</span>
+                <Film className="size-4.5 text-primary shrink-0" />
+                <span className="truncate">Subscribe to Video Vault</span>
               </>
             ) : (
-              <span>Unlock Creator Vault</span>
+              <span className="truncate">Unlock Creator Vault</span>
             )}
           </DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground">
+          <DialogDescription className="text-xs text-muted-foreground leading-relaxed break-words">
             {isAudioItem
               ? "Direct one-time purchase for permanent lifetime streaming and download."
               : isVideoItem
@@ -104,12 +104,12 @@ export function SubscriptionModal({
         </DialogHeader>
 
         {item ? (
-          <div className="p-3 sm:p-3.5 my-2.5 sm:my-3 rounded-lg border border-border/80 bg-muted/20 flex items-center justify-between gap-2.5 sm:gap-3">
-            <div className="min-w-0 space-y-0.5">
-              <div className="flex items-center gap-1.5">
+          <div className="p-3 sm:p-3.5 my-2 rounded-lg border border-border/80 bg-muted/20 space-y-2">
+            <div className="flex items-center justify-between gap-2 min-w-0">
+              <div className="flex items-center gap-1.5 min-w-0 flex-1">
                 <Badge
                   variant="outline"
-                  className="text-[10px] px-1 py-0 h-4 uppercase tracking-wider font-semibold"
+                  className="text-[10px] px-1 py-0 h-4 uppercase tracking-wider font-semibold shrink-0"
                 >
                   {isAudioItem ? "Lifetime Audio" : "Annual Video"}
                 </Badge>
@@ -119,26 +119,29 @@ export function SubscriptionModal({
                   </span>
                 )}
               </div>
+              <div className="text-right shrink-0">
+                <span className="text-base sm:text-lg font-bold text-foreground">
+                  ${item.price.toFixed(2)}
+                </span>
+                <span className="text-[10px] text-muted-foreground ml-1">
+                  {isAudioItem ? "one-time" : "/ yr"}
+                </span>
+              </div>
+            </div>
+
+            <div className="min-w-0 space-y-0.5 pt-0.5">
               <p className="text-sm font-semibold text-foreground truncate">
                 {item.title}
               </p>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-[11px] text-muted-foreground leading-normal">
                 {isAudioItem
                   ? "Instant MP3/WAV download & lifetime streaming"
                   : "All current and upcoming 4K studio videos included"}
               </p>
             </div>
-            <div className="text-right shrink-0">
-              <p className="text-lg sm:text-xl font-bold text-foreground">
-                ${item.price.toFixed(2)}
-              </p>
-              <p className="text-[10px] text-muted-foreground">
-                {isAudioItem ? "one-time" : "/ year"}
-              </p>
-            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-2.5 my-3">
+          <div className="grid grid-cols-2 gap-2.5 my-2">
             <button
               type="button"
               onClick={() => setSelectedTier("yearly")}
@@ -188,21 +191,21 @@ export function SubscriptionModal({
         )}
 
         <div className="space-y-1.5 py-1 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Check className="size-3.5 text-emerald-500 shrink-0" />
-            <span>
+          <div className="flex items-start gap-2">
+            <Check className="size-3.5 text-emerald-500 shrink-0 mt-0.5" />
+            <span className="leading-tight">
               {isAudioItem
                 ? "Instant lifetime access immediately upon checkout"
                 : "Instant 1-year access to all 4K videos upon checkout"}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <Check className="size-3.5 text-emerald-500 shrink-0" />
-            <span>Encrypted 256-bit secure transaction</span>
+          <div className="flex items-start gap-2">
+            <Check className="size-3.5 text-emerald-500 shrink-0 mt-0.5" />
+            <span className="leading-tight">Encrypted 256-bit secure transaction</span>
           </div>
         </div>
 
-        <div className="space-y-2 pt-3 border-t border-border/60">
+        <div className="space-y-2 pt-2.5 sm:pt-3 border-t border-border/60">
           <Button
             type="button"
             variant="default"
@@ -213,13 +216,13 @@ export function SubscriptionModal({
           >
             {isProcessing && activePaymentMethod === "apple" ? (
               <>
-                <Loader2 className="size-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin shrink-0" />
                 <span>Processing...</span>
               </>
             ) : (
               <>
-                <FaApple className="size-4.5" />
-                <span>{appleButtonLabel}</span>
+                <FaApple className="size-4 shrink-0" />
+                <span className="truncate">{appleButtonLabel}</span>
               </>
             )}
           </Button>
@@ -234,13 +237,13 @@ export function SubscriptionModal({
           >
             {isProcessing && activePaymentMethod === "google" ? (
               <>
-                <Loader2 className="size-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin shrink-0" />
                 <span>Processing...</span>
               </>
             ) : (
               <>
-                <FaGoogle className="size-4" />
-                <span>{googleButtonLabel}</span>
+                <FaGoogle className="size-4 shrink-0" />
+                <span className="truncate">{googleButtonLabel}</span>
               </>
             )}
           </Button>
