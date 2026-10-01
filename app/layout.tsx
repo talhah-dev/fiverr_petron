@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 import { DM_Sans } from "next/font/google"
-import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
 const dmSans = DM_Sans({
@@ -21,18 +20,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      suppressHydrationWarning
-      className={`${dmSans.variable} h-full antialiased`}
+      className={`${dmSans.variable} dark h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground antialiased font-sans selection:bg-foreground selection:text-background">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   )

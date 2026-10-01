@@ -1,8 +1,7 @@
 "use client"
 
-import { useState, useEffect, useSyncExternalStore } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useTheme } from "next-themes"
 import {
   Volume2,
   VolumeX,
@@ -10,8 +9,6 @@ import {
   CheckCircle2,
   Sparkles,
   User,
-  Sun,
-  Moon,
 } from "lucide-react"
 import {
   FaYoutube,
@@ -33,8 +30,6 @@ interface HeroHeaderProps {
   onOpenMemberModal: () => void
 }
 
-const emptySubscribe = () => () => {}
-
 export function HeroHeader({
   subscription,
   isVideoMuted,
@@ -43,13 +38,6 @@ export function HeroHeader({
   onOpenMemberModal,
 }: HeroHeaderProps) {
   const [viewCount, setViewCount] = useState(1918)
-  const { resolvedTheme, setTheme } = useTheme()
-
-  const mounted = useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  )
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -77,24 +65,6 @@ export function HeroHeader({
         </Button>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon-sm"
-            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-            aria-label="Toggle dark mode"
-            className="cursor-pointer"
-          >
-            {mounted ? (
-              resolvedTheme === "dark" ? (
-                <Sun className="size-3.5 text-foreground" />
-              ) : (
-                <Moon className="size-3.5 text-foreground" />
-              )
-            ) : (
-              <span className="size-3.5" />
-            )}
-          </Button>
-
           {isSubscribed ? (
             <Button
               variant="outline"
@@ -121,7 +91,7 @@ export function HeroHeader({
 
       <div className="flex flex-col items-center text-center space-y-4 max-w-md w-full">
         <div className="flex flex-col items-center">
-          <ProfileAvatar initialName="swagsxn" size={96} />
+          <ProfileAvatar size={96} />
           <div className="space-y-1">
             <div className="flex items-center justify-center gap-1.5">
               <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -138,7 +108,7 @@ export function HeroHeader({
           <Link
             href="mailto:contact@swagsxn.art"
             aria-label="Email"
-            className="p-2.5 rounded-full text-foreground hover:opacity-75 dark:text-muted-foreground dark:hover:text-foreground transition-all hover:bg-muted/50"
+            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-all hover:bg-muted/50"
           >
             <FaEnvelope className="size-5" />
           </Link>
@@ -147,7 +117,7 @@ export function HeroHeader({
             target="_blank"
             rel="noreferrer"
             aria-label="YouTube"
-            className="p-2.5 rounded-full text-foreground hover:opacity-75 dark:text-muted-foreground dark:hover:text-foreground transition-all hover:bg-muted/50"
+            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-all hover:bg-muted/50"
           >
             <FaYoutube className="size-5" />
           </Link>
@@ -156,7 +126,7 @@ export function HeroHeader({
             target="_blank"
             rel="noreferrer"
             aria-label="Instagram"
-            className="p-2.5 rounded-full text-foreground hover:opacity-75 dark:text-muted-foreground dark:hover:text-foreground transition-all hover:bg-muted/50"
+            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-all hover:bg-muted/50"
           >
             <FaInstagram className="size-5" />
           </Link>
@@ -165,7 +135,7 @@ export function HeroHeader({
             target="_blank"
             rel="noreferrer"
             aria-label="TikTok"
-            className="p-2.5 rounded-full text-foreground hover:opacity-75 dark:text-muted-foreground dark:hover:text-foreground transition-all hover:bg-muted/50"
+            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-all hover:bg-muted/50"
           >
             <FaTiktok className="size-5" />
           </Link>
@@ -174,13 +144,13 @@ export function HeroHeader({
             target="_blank"
             rel="noreferrer"
             aria-label="Spotify"
-            className="p-2.5 rounded-full text-foreground hover:opacity-75 dark:text-muted-foreground dark:hover:text-foreground transition-all hover:bg-muted/50"
+            className="p-2.5 rounded-full text-muted-foreground hover:text-foreground transition-all hover:bg-muted/50"
           >
             <FaSpotify className="size-5" />
           </Link>
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs text-foreground dark:text-muted-foreground font-medium pt-0.5">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-0.5">
           <Eye className="size-3.5" />
           <span className="font-mono">{viewCount.toLocaleString()}</span>
           <span>views</span>

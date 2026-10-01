@@ -46,7 +46,7 @@ export function MediaCatalog({
           <h2 className="text-base font-semibold tracking-tight text-foreground">
             Exclusive Vault
           </h2>
-          <p className="text-xs text-foreground/80 dark:text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             Songs, videos & unreleased audio
           </p>
         </div>
@@ -57,7 +57,7 @@ export function MediaCatalog({
             className={`px-3 py-1.5 rounded-md transition-all text-center whitespace-nowrap cursor-pointer ${
               filter === "all"
                 ? "bg-background text-foreground shadow-xs font-medium"
-                : "text-foreground/75 dark:text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             All
@@ -67,7 +67,7 @@ export function MediaCatalog({
             className={`px-3 py-1.5 rounded-md transition-all text-center whitespace-nowrap cursor-pointer ${
               filter === "song"
                 ? "bg-background text-foreground shadow-xs font-medium"
-                : "text-foreground/75 dark:text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Songs
@@ -77,7 +77,7 @@ export function MediaCatalog({
             className={`px-3 py-1.5 rounded-md transition-all text-center whitespace-nowrap cursor-pointer ${
               filter === "video"
                 ? "bg-background text-foreground shadow-xs font-medium"
-                : "text-foreground/75 dark:text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Videos
@@ -126,7 +126,7 @@ export function MediaCatalog({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-foreground/80 dark:text-muted-foreground">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         {item.type === "song" ? (
                           <Music className="size-3" />
@@ -153,7 +153,7 @@ export function MediaCatalog({
                       variant="ghost"
                       size="sm"
                       onClick={() => onTogglePlay(item)}
-                      className="text-xs gap-1.5 text-foreground/80 hover:text-foreground cursor-pointer"
+                      className="text-xs gap-1.5 text-muted-foreground hover:text-foreground cursor-pointer"
                     >
                       <Download className="size-3.5" />
                       <span className="hidden sm:inline">Stream</span>
@@ -165,7 +165,7 @@ export function MediaCatalog({
                       onClick={onOpenSubscription}
                       className="text-xs gap-1.5 h-8 border-border/80 hover:bg-muted/80 cursor-pointer"
                     >
-                      <Lock className="size-3 text-foreground/70 dark:text-muted-foreground" />
+                      <Lock className="size-3 text-muted-foreground" />
                       <span>Unlock</span>
                     </Button>
                   )}
@@ -185,7 +185,7 @@ export function MediaCatalog({
             <h3 className="text-sm font-medium text-foreground">
               Unlock Full Vault
             </h3>
-            <p className="text-xs text-foreground/80 dark:text-muted-foreground mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               Instant streaming for all songs and 4K videos.
             </p>
           </div>
