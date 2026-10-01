@@ -41,13 +41,13 @@ export function AudioPlayerBar({
 
   return (
     <div className="fixed bottom-4 inset-x-0 mx-auto max-w-xl px-4 z-40 animate-in fade-in slide-in-from-bottom-3 duration-200">
-      <div className="bg-card/90 backdrop-blur-md border border-border/80 rounded-xl p-3 shadow-lg flex items-center justify-between gap-3">
+      <div className="bg-black/55 backdrop-blur-xl border border-white/15 rounded-xl p-3 shadow-2xl flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <Button
             variant="default"
             size="icon"
             onClick={onTogglePlay}
-            className="size-9 rounded-full shrink-0"
+            className="size-9 rounded-full shrink-0 bg-white/15 hover:bg-white/25 text-white border border-white/20 backdrop-blur-md cursor-pointer transition-all shadow-xs"
             aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? (
@@ -77,9 +77,9 @@ export function AudioPlayerBar({
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="w-28 sm:w-44 h-1 bg-muted rounded-full overflow-hidden">
+              <div className="w-28 sm:w-44 h-1 bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-foreground transition-all duration-300"
+                  className="h-full bg-white/90 transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -96,7 +96,7 @@ export function AudioPlayerBar({
               variant="outline"
               size="sm"
               onClick={onOpenSubscription}
-              className="text-xs h-7 gap-1 border-border/80"
+              className="text-xs h-7 gap-1 bg-white/10 hover:bg-white/20 border border-white/25 text-white backdrop-blur-md cursor-pointer transition-all"
             >
               <Lock className="size-3" />
               <span>{item.type === "song" ? "Buy $29" : "Subscribe"}</span>
@@ -108,7 +108,7 @@ export function AudioPlayerBar({
             size="icon-xs"
             onClick={onClose}
             aria-label="Close player"
-            className="text-muted-foreground hover:text-foreground size-7"
+            className="text-white/60 hover:text-white hover:bg-white/10 size-7 cursor-pointer"
           >
             <X className="size-3.5" />
           </Button>

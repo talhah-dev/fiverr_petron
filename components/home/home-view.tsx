@@ -157,7 +157,7 @@ export function HomeView() {
 
       <main
         id="vault-section"
-        className="relative z-10 w-full min-w-full bg-background border-t border-border/40 flex flex-col items-center pt-8 sm:pt-10 overflow-x-hidden"
+        className="relative z-10 w-full min-w-full  flex flex-col items-center pt-8 sm:pt-10 overflow-x-hidden"
       >
         <MediaCatalog
           items={INITIAL_MEDIA_ITEMS}

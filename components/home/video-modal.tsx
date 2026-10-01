@@ -41,7 +41,7 @@ export function VideoModal({ isOpen, onClose, item }: VideoModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] sm:max-w-3xl p-3 sm:p-5 bg-card border-border/80 shadow-2xl rounded-xl overflow-hidden box-border">
+      <DialogContent className="w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] sm:max-w-3xl p-3 sm:p-5 bg-black/85 backdrop-blur-2xl border-white/15 shadow-2xl rounded-xl overflow-hidden box-border">
         <DialogHeader className="space-y-1.5 text-left pr-7 min-w-0">
           <div className="flex flex-wrap items-center gap-1.5">
             <Badge variant="default" className="text-[10px] sm:text-xs font-semibold gap-1">

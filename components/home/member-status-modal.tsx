@@ -43,7 +43,7 @@ export function MemberStatusModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] sm:max-w-md p-4 sm:p-6 bg-card border-border/80 shadow-lg rounded-xl overflow-hidden box-border">
+      <DialogContent className="w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] sm:max-w-md p-4 sm:p-6 bg-black/80 backdrop-blur-2xl border-white/15 shadow-2xl rounded-xl overflow-hidden box-border">
         <DialogHeader className="space-y-1 text-left pr-7 min-w-0">
           <DialogTitle className="text-base sm:text-lg font-bold tracking-tight">
             {isSubscribed ? "Member Account & Access" : "Customer Sign In"}
@@ -57,7 +57,7 @@ export function MemberStatusModal({
 
         {isSubscribed ? (
           <div className="space-y-4 py-2">
-            <div className="p-3.5 rounded-lg border border-border/60 bg-muted/20 space-y-2.5">
+            <div className="p-3.5 rounded-lg border border-white/10 bg-white/5 space-y-2.5 backdrop-blur-md">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Plan Status</span>
                 <Badge
@@ -103,7 +103,7 @@ export function MemberStatusModal({
                 onSignOut()
                 onClose()
               }}
-              className="w-full text-xs text-muted-foreground hover:text-destructive h-8 gap-1.5 cursor-pointer"
+              className="w-full text-xs text-white/70 hover:text-red-400 bg-white/5 hover:bg-red-500/10 border border-white/10 h-8 gap-1.5 cursor-pointer backdrop-blur-md transition-all"
             >
               <LogOut className="size-3.5" />
               <span>Sign Out</span>
@@ -121,7 +121,7 @@ export function MemberStatusModal({
                 value={inputEmail}
                 onChange={(e) => setInputEmail(e.target.value)}
                 required
-                className="h-10 text-sm px-3"
+                className="h-10 text-sm px-3 bg-white/5 border-white/15 text-white placeholder:text-white/40 backdrop-blur-md"
               />
             </div>
 
@@ -132,23 +132,27 @@ export function MemberStatusModal({
               <div className="grid grid-cols-2 gap-2.5">
                 <Button
                   type="button"
-                  variant={
-                    selectedDemoTier === "yearly" ? "default" : "outline"
-                  }
+                  variant="outline"
                   size="default"
                   onClick={() => setSelectedDemoTier("yearly")}
-                  className="text-xs h-9 cursor-pointer"
+                  className={`text-xs h-9 cursor-pointer transition-all ${
+                    selectedDemoTier === "yearly"
+                      ? "bg-white/20 text-white border-white/40 ring-1 ring-white/30"
+                      : "bg-white/5 text-white/70 border-white/15 hover:bg-white/10 hover:text-white"
+                  }`}
                 >
                   Yearly Member
                 </Button>
                 <Button
                   type="button"
-                  variant={
-                    selectedDemoTier === "lifetime" ? "default" : "outline"
-                  }
+                  variant="outline"
                   size="default"
                   onClick={() => setSelectedDemoTier("lifetime")}
-                  className="text-xs h-9 cursor-pointer"
+                  className={`text-xs h-9 cursor-pointer transition-all ${
+                    selectedDemoTier === "lifetime"
+                      ? "bg-white/20 text-white border-white/40 ring-1 ring-white/30"
+                      : "bg-white/5 text-white/70 border-white/15 hover:bg-white/10 hover:text-white"
+                  }`}
                 >
                   Lifetime VIP
                 </Button>
@@ -158,7 +162,7 @@ export function MemberStatusModal({
             <Button
               type="submit"
               size="lg"
-              className="w-full text-xs h-10 font-medium cursor-pointer"
+              className="w-full text-xs h-10 font-medium cursor-pointer bg-white/15 hover:bg-white/25 text-white border border-white/20 backdrop-blur-md transition-all"
             >
               Sign In with Magic Link
             </Button>
