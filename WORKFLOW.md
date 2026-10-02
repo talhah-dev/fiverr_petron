@@ -1,374 +1,194 @@
-# Project Architecture & Workflow Specification
+# Petron Artist Platform — System Workflow & Architecture Documentation
 
-A comprehensive technical and functional blueprint for the creator platform combining a **guns.lol aesthetic profile front-page** with a **Patreon-style single-page subscription & media delivery system**.
+## 1. System Overview
 
----
+**Petron** is a luxury, glassmorphic direct-to-fan media distribution platform built with Next.js 16 (App Router), TypeScript, Tailwind CSS v4, and shadcn/ui. 
 
-## 1. Executive Summary & Core Concept
-
-### 1.1 Overview
-The platform allows an artist/creator to showcase and sell exclusive access to their songs, music videos, and digital content. It fuses two distinct models into a seamless user experience:
-1. **Front-End Vibe (Guns.lol Inspiration)**: An atmospheric, immersive landing page with a looping background video, ambient background music with an audio toggle, creator status, social links, and live view count analytics.
-2. **Monetization Engine (Patreon Inspiration)**: A clean, frictionless single-page subscription checkout. Visitors can unlock all songs and videos via **Yearly Subscription** or **Lifetime Access** with 1-click biometric payments (**Apple Pay** and **Google Pay**).
-3. **Frictionless Onboarding**: Account registration is combined with the payment process. Users never deal with tedious multi-step forms before paying. Access is granted instantly, and returning customers can log in at any time to stream their media.
-
----
-
-## 2. Complete User Journey & Flowcharts
-
-### 2.1 First-Time Visitor to Member Flow
+The platform allows artists to showcase exclusive music singles, stem packages, and 4K visualizers with a per-item digital store and subscription monetization engine.
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor Visitor as Visitor (Mobile / Desktop)
-    participant Hero as Front Page (Hero + Audio/Video)
-    participant Catalog as Media Showcase (Songs & Videos)
-    participant Checkout as Stripe Express (Apple/Google Pay)
-    participant Webhook as Webhook & Auth Service
-    participant Portal as Member Streaming Player
-
-    Visitor->>Hero: Lands on website
-    Hero->>Hero: Plays background video + audio toggle available
-    Hero->>Hero: Increments live view counter (GA4 / Edge counter)
-    Visitor->>Catalog: Previews short sample audio / video teaser
-    Visitor->>Catalog: Clicks "Unlock Full Access" or "Subscribe"
-    Catalog->>Checkout: Opens 1-page subscription drawer (Yearly vs Lifetime)
-    Visitor->>Checkout: Selects tier & taps Apple Pay / Google Pay (Biometric confirmation)
-    Checkout->>Webhook: Payment confirmed + Customer email received
-    Webhook->>Webhook: Auto-creates User Account & assigns Subscription
-    Webhook-->>Visitor: Instant access token / session established
-    Visitor->>Portal: Immediately unlocked — plays full songs & videos
-    Webhook->>Visitor: Sends welcome email with 1-click login magic link
-```
-
-### 2.2 Returning Customer Login Flow
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Customer as Returning Customer
-    participant Login as Login Modal / Magic Link
-    participant Auth as Auth & DB Engine
-    participant Portal as Member Media Portal
-
-    Customer->>Login: Clicks "Sign In" or accesses protected song
-    Customer->>Login: Enters email or uses Google Sign-In
-    Login->>Auth: Validates active Yearly or Lifetime entitlement
-    alt Active Subscription (Yearly / Lifetime)
-        Auth-->>Portal: Grant stream permissions (Signed URLs)
-        Portal-->>Customer: Full playback of all songs & videos
-    else Expired Yearly Subscription
-        Auth-->>Customer: Prompts Renewal Modal (Apple Pay / Google Pay)
-    end
+flowchart TD
+    A[Visitor Lands on Platform] --> B[VideoBackground Autoplays Muted]
+    B --> C[Browse MediaCatalog: All / Audio / Videos]
+    
+    C -->|Song Item: Unlocked?| D{Is Song Purchased?}
+    D -->|No| E[Open SubscriptionModal: $29 One-Time Song Checkout]
+    D -->|Yes| F[Trigger AudioPlayerBar: Floating Bottom Streamer]
+    
+    C -->|Video Item: Unlocked?| G{Is Video Purchased?}
+    G -->|No| H[Open SubscriptionModal: Choose Yearly $29/yr or Lifetime $79]
+    G -->|Yes| I[Trigger VideoModal: 4K Popup Cinema Player]
+    
+    E -->|Apple Pay / Google Pay| J[Add itemId to purchasedItemIds]
+    H -->|Apple Pay / Google Pay| J
+    J --> K[Unlock Item & Enable Stream / Watch Actions]
+    
+    L[HeroHeader] -->|Mute Button| M[Toggle Background Video Audio]
+    L -->|Sign In / Member Status| N[Open MemberStatusModal: Auto-Renewal Enabled]
 ```
 
 ---
 
-## 3. Subscription & Pricing Tiers
+## 2. Core Architectural & Design Principles
 
-| Feature | Tier 1: Yearly Subscription | Tier 2: Lifetime Access |
-| :--- | :--- | :--- |
-| **Billing Model** | Recurring annual charge (e.g., $29/year) | One-time single payment (e.g., $79) |
-| **Duration** | 365 days from purchase date | Permanent / Indefinite |
-| **Cancellation Policy** | Can cancel anytime; keeps access until year ends | Non-expiring, no cancellation needed |
-| **Songs Access** | Full uncompressed audio streaming + lyrics | Full uncompressed audio streaming + lyrics |
-| **Videos Access** | Full 1080p/4K music videos & behind-the-scenes | Full 1080p/4K music videos & behind-the-scenes |
-| **Future Releases** | Unlocked as long as subscription is active | Unlocked forever for all present & future drops |
-| **Express Payment** | Apple Pay / Google Pay / Credit Card | Apple Pay / Google Pay / Credit Card |
-
----
-
-## 4. Front-End Layout & UI Workflow
-
-### 4.1 Page Structure (Single-Page Experience)
-
-```
-+--------------------------------------------------------------------+
-|  [🔊 Audio Toggle]                             [🔑 Sign In / Portal] |
-|                                                                    |
-|                       BACKGROUND VIDEO LOOP                        |
-|                                                                    |
-|                           [ ARTIST AVATAR ]                        |
-|                              Artist Name                           |
-|                       🔴 User Status / Badge                       |
-|                                                                    |
-|              [✉ Email] [▶ YouTube] [📷 IG] [🎵 TikTok]             |
-|                                                                    |
-|                           👁 1,918 Views                           |
-|                                                                    |
-+--------------------------------------------------------------------+
-|                                                                    |
-|                    EXCLUSIVE SONGS & VIDEOS                        |
-|                                                                    |
-|   +--------------------------+    +--------------------------+     |
-|   |  🎵 Song Title 1         |    |  🎵 Song Title 2         |     |
-|   |  [Waveform / 30s Sample] |    |  [Waveform / 30s Sample] |     |
-|   |  🔒 LOCKED (Subscribers) |    |  🔒 LOCKED (Subscribers) |     |
-|   +--------------------------+    +--------------------------+     |
-|                                                                    |
-|   +--------------------------+    +--------------------------+     |
-|   |  🎬 Music Video 1        |    |  🎬 Exclusive Video 2    |     |
-|   |  [Blurred Preview]       |    |  [Blurred Preview]       |     |
-|   |  🔒 LOCKED (Subscribers) |    |  🔒 LOCKED (Subscribers) |     |
-|   +--------------------------+    +--------------------------+     |
-|                                                                    |
-|              [ ⚡ UNLOCK ALL ACCESS (Patreon Flow) ]                |
-+--------------------------------------------------------------------+
-|                                                                    |
-|        SUBSCRIPTION DRAWER / MODAL (Triggered on Click)            |
-|                                                                    |
-|   +-------------------------+     +-------------------------+      |
-|   |       YEARLY PASS       |     |      LIFETIME PASS      |      |
-|   |       $29 / year        |     |       $79 one-time      |      |
-|   |  • All songs & videos   |     |  • Lifetime VIP access  |      |
-|   |  • Cancel anytime       |     |  • Never pay again      |      |
-|   +-------------------------+     +-------------------------+      |
-|                                                                    |
-|             [  Pay  Pay with Apple Pay (Face ID)  ]               |
-|             [  GPay  Pay with Google Pay (Biometric) ]             |
-|             [  💳   Pay with Card / Other Methods  ]               |
-|                                                                    |
-+--------------------------------------------------------------------+
-```
-
-### 4.2 UI Component Details
-
-1. **Ambient Video Background (guns.lol style)**:
-   - Fullscreen HTML5 `<video>` looping smoothly with CSS overlay to preserve text legibility.
-   - Fixed Audio Toggle Icon button (top-left) letting the visitor mute/unmute the theme track at will.
-   - Fallback poster image for low-bandwidth devices or battery-saving mobile modes.
-
-2. **Artist Identity & Socials**:
-   - Artist handle/logo typography with subtle glitch or shimmer styling.
-   - Status tag (e.g. `discord.gg/guns` or verified creator badge).
-   - Minimalist social icon row (Email, YouTube, Instagram, TikTok, Spotify/SoundCloud).
-   - Dynamic view count badge (`👁 1,918`) integrated with Google Analytics / database counter.
-
-3. **Media Catalog (Teaser Mode)**:
-   - **Audio Track Cards**: Interactive audio waveforms with 30-second previews. A locked badge indicates full high-definition download and stream require an active pass.
-   - **Video Cards**: Embedded video players with 15-second teaser clips and a blurred overlay prompting upgrade for full 4K view.
-
-4. **Patreon-Inspired Subscription Checkout Modal**:
-   - Triggered either by clicking a locked track, the "Unlock All" floating bar, or the header "Subscribe" button.
-   - Two side-by-side cards: **Yearly** vs. **Lifetime**.
-   - Direct integration of **Stripe Payment Request Button**:
-     - On iOS/Safari: Displays **Apple Pay** button automatically, triggering Face ID / Touch ID.
-     - On Android/Chrome: Displays **Google Pay** button automatically, triggering fingerprint/biometric auth.
-     - Fallback: Stripe card input for browsers without native digital wallets.
+1. **Per-Item Monetization Model**:
+   - Every single audio track and every single video is purchased on an individual item basis (`purchasedItemIds: string[]`).
+   - Purchasing an audio track unlocks that specific track for bottom streaming.
+   - Purchasing a video unlocks that specific video for high-definition popup viewing.
+2. **100% Transparent Glassmorphism**:
+   - All interactive controls, cards, headers, modal dialogues, and buttons feature transparent backgrounds with ultra-sheer borders and glassmorphic backdrops.
+   - The looping background video remains visible through every section of the UI.
+3. **Frictionless Entry**:
+   - No landing gates or "Click to Enter" modals. The background video (`/video.mp4`) autoplays muted in an infinite loop.
+   - Users can toggle audio for the background video at any time via the top-left mute button.
+4. **Express Checkout**:
+   - Simulated 1-click **Apple Pay** and **Google Pay** payment sheets for frictionless purchasing.
 
 ---
 
-## 5. Frictionless Registration & Auth Architecture
+## 3. Detailed Component Breakdown
 
-A core client requirement is that **account creation happens directly with payment**, eliminating high-friction registration barriers.
-
-### 5.1 The "Payment-First" Account Creation Architecture
-
-```
-1. Visitor selects "Yearly" or "Lifetime" and taps Apple Pay / Google Pay.
-2. Apple Pay / Google Pay automatically exposes the user's verified email address in the Stripe payment token.
-3. Stripe Webhook fires `checkout.session.completed` or `payment_intent.succeeded`.
-4. The Backend:
-   a. Checks if a user with that email already exists.
-   b. If not, automatically creates the user record:
-      - Email: derived from Apple Pay / Google Pay metadata.
-      - Auth Method: Passwordless Magic Link / Auto-session.
-   c. Creates or updates the Subscription record:
-      - Tier: `yearly` or `lifetime`
-      - Status: `active`
-      - Current Period End: 1 year from now (or permanent timestamp for lifetime)
-5. The front-end immediately unlocks protected media via active session cookie / JWT.
-6. A transactional email is sent to the customer:
-   - Subject: "Your VIP Access is Unlocked!"
-   - Contains: Direct 1-click magic login link to access their library on any device at any time.
-```
-
-### 5.2 Subscription State Machine
-
-```
-               [ VISITOR / GUEST ]
-                        │
-                        ▼ (Apple Pay / Google Pay)
-               [ ACTIVE_SUBSCRIBER ]
-                  │             │
-        (Yearly Plan)      (Lifetime Plan)
-                  │             │
-                  │             ▼
-                  │       [ PERMANENT_ACCESS ]
-                  │        (Never expires)
-                  ▼
-        (User Cancels Yearly)
-                  │
-                  ▼
-     [ CANCELLED_PENDING_EXPIRATION ]
-   (Access remains until 365 days end)
-                  │
-                  ▼ (Period ends)
-              [ EXPIRED ]
-                  │
-                  ▼ (Renew button)
-               [ ACTIVE ]
-```
+### 3.1. Master Controller: `HomeView`
+- **File**: [`components/home/home-view.tsx`](file:///a:/Fiverr/petron/components/home/home-view.tsx)
+- **Role**: Coordinates global state:
+  - `subscription`: Current user subscription status and list of `purchasedItemIds`.
+  - `activeItem`: Currently active audio track playing in `AudioPlayerBar`.
+  - `selectedPaymentItem`: Active item being checked out inside `SubscriptionModal`.
+  - `selectedVideoItem`: Active video item loaded into `VideoModal`.
+  - `isMuted`: Audio mute toggle for the ambient background video.
+  - `isMemberModalOpen`: Visibility of customer profile/subscription manager.
 
 ---
 
-## 6. Technical Stack & Architecture
-
-### 6.1 Technology Choices
-
-| Domain | Technology | Justification |
-| :--- | :--- | :--- |
-| **Framework** | Next.js 16 (App Router) + TypeScript | High performance, server actions, dynamic edge rendering, SEO-ready. |
-| **Styling & UI** | Tailwind CSS + shadcn/ui | Minimalist, clean aesthetics, zero visual clutter, compliant with design guidelines. |
-| **Icons** | Lucide React | Lightweight, accessible iconography. |
-| **Payments** | Stripe Billing + Stripe Elements | Native support for Apple Pay, Google Pay, recurring subscriptions, and one-off lifetime charges. |
-| **Authentication** | NextAuth / Auth.js (or Supabase Auth) | Seamless passwordless Magic Links + Google Provider + JWT session cookies. |
-| **Database** | PostgreSQL (Prisma ORM / Supabase) | Relational integrity for Users, Subscriptions, Payments, and Media. |
-| **Media Hosting** | Cloudflare Stream / AWS S3 + Signed URLs | Protects songs and videos from direct URL scraping; tokens expire after playback. |
-| **Analytics** | Google Analytics 4 + Edge View Tracker | Accurate pageview counting and user engagement metrics. |
+### 3.2. Ambient Media Layer: `VideoBackground`
+- **File**: [`components/home/video-background.tsx`](file:///a:/Fiverr/petron/components/home/video-background.tsx)
+- **Role**: Fullscreen ambient video element playing `/video.mp4` with `object-cover` and GPU acceleration.
+- **Behavior**:
+  - Always rendered at `z-0` beneath the content layer.
+  - Controlled by the `isMuted` state passed from `HomeView`.
+  - Free from intrusive full-page entry gates.
 
 ---
 
-## 7. Data Models & Database Schema
+### 3.3. Navigation & Status Bar: `HeroHeader`
+- **File**: [`components/home/hero-header.tsx`](file:///a:/Fiverr/petron/components/home/hero-header.tsx)
+- **Role**: Top navigation bar with artist metadata and persistent utility actions.
+- **Features**:
+  - **Ambient Audio Toggle**: Top-left volume button (`Volume2` / `VolumeX`) with visual sound wave indicator.
+  - **Artist Identity**: Avatar, artist handle (`@PETRON`), location badge, and verified badge.
+  - **Social Links**: Direct links to Instagram, SoundCloud, Spotify, and YouTube.
+  - **Live Metrics**: Viewer counter and PRO member count indicator.
+  - **Account Status**: Pill button showing "Sign In" or "Member Active" which triggers `MemberStatusModal`.
 
-```prisma
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+---
+
+### 3.4. Catalog & Digital Store: `MediaCatalog`
+- **File**: [`components/home/media-catalog.tsx`](file:///a:/Fiverr/petron/components/home/media-catalog.tsx)
+- **Role**: Main showcase of digital assets with category filtering and access state verification.
+- **Filter Tabs**:
+  - `All Items`: Shows all available audio and video items.
+  - `Audio`: Filtered list of music singles and stem packages.
+  - `Videos`: Filtered list of 4K studio visualizers and films.
+- **Item Cards**:
+  - **Locked Audio**: Displays transparent "Buy $29" button with lock icon $\rightarrow$ triggers `SubscriptionModal`.
+  - **Unlocked Audio**: Displays transparent "Stream" button with play icon $\rightarrow$ triggers `AudioPlayerBar`.
+  - **Locked Video**: Displays transparent "Subscribe" button with lock icon $\rightarrow$ triggers `SubscriptionModal`.
+  - **Unlocked Video**: Displays transparent "Watch" button with play icon $\rightarrow$ triggers `VideoModal`.
+
+---
+
+### 3.5. Audio Playback Streamer: `AudioPlayerBar`
+- **File**: [`components/home/audio-player-bar.tsx`](file:///a:/Fiverr/petron/components/home/audio-player-bar.tsx)
+- **Role**: Floating bottom dock that mounts when an unlocked song is clicked.
+- **Features**:
+  - Play/Pause toggle with animated playback simulation.
+  - Real-time scrubbing progress bar with current and total duration timecodes.
+  - Track thumbnail, title, artist name, and dismiss button.
+  - Ultra-clear glassmorphism styling that floats above the background.
+
+---
+
+### 3.6. 4K Cinema Viewer: `VideoModal`
+- **File**: [`components/home/video-modal.tsx`](file:///a:/Fiverr/petron/components/home/video-modal.tsx)
+- **Role**: Dedicated modal popup for watching unlocked exclusive videos.
+- **Features**:
+  - HTML5 video player with standard playback controls (`play`, `pause`, `scrubber`, `fullscreen`).
+  - 4K Ultra HD badge and duration display.
+  - Video tags and genre metadata.
+  - Transparent backdrop and header with close button.
+
+---
+
+### 3.7. Checkout & Payment Engine: `SubscriptionModal`
+- **File**: [`components/home/subscription-modal.tsx`](file:///a:/Fiverr/petron/components/home/subscription-modal.tsx)
+- **Role**: Payment sheet modal supporting 1-click Apple Pay and Google Pay.
+- **Per-Item Monetization Schemes**:
+  1. **Song Checkout ($29)**:
+     - Single one-time purchase.
+     - Unlocks immediate audio streaming rights for the selected song.
+  2. **Video Checkout (Dual Choice)**:
+     - **Yearly Access ($29 / year)**: 12 months recurring streaming access for the selected video.
+     - **Lifetime Access ($79 one-time)**: Permanent unlocked access for the selected video.
+- **Payment Processing**:
+  - Simulated instant processing with spinner states.
+  - Automatic addition of `itemId` into `purchasedItemIds`.
+  - Instant transition of catalog card to "Stream" or "Watch".
+
+---
+
+### 3.8. Member Management: `MemberStatusModal`
+- **File**: [`components/home/member-status-modal.tsx`](file:///a:/Fiverr/petron/components/home/member-status-modal.tsx)
+- **Role**: Account status viewer and authentication sheet.
+- **Features**:
+  - Customer ID and account email display.
+  - **Auto Renewal Indicator**: Fixed status marked as `Auto Renewal: Enabled`.
+  - Active tier badge and access expiration timecode.
+  - Sign In / Sign Out actions.
+
+---
+
+## 4. Data Models & Type Definitions
+
+Defined in [`components/home/types.ts`](file:///a:/Fiverr/petron/components/home/types.ts):
+
+```typescript
+export type MediaType = "song" | "video"
+
+export interface MediaItem {
+  id: string
+  title: string
+  type: MediaType
+  duration: string
+  releaseDate: string
+  isExclusive: boolean
+  genre?: string
+  bpm?: string
+  tags?: string[]
+  price: number
+  thumbnailUrl?: string
 }
 
-enum SubscriptionTier {
-  YEARLY
-  LIFETIME
-}
+export type SubscriptionTier = "free" | "yearly" | "lifetime"
 
-enum SubscriptionStatus {
-  ACTIVE
-  CANCELLED
-  EXPIRED
-  PAST_DUE
-}
-
-enum MediaType {
-  SONG
-  VIDEO
-}
-
-model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  name          String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  subscriptions Subscription[]
-}
-
-model Subscription {
-  id                   String             @id @default(cuid())
-  userId               String
-  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tier                 SubscriptionTier
-  status               SubscriptionStatus @default(ACTIVE)
-  stripeCustomerId     String?            @unique
-  stripeSubscriptionId String?            @unique
-  stripePriceId        String?
-  startDate            DateTime           @default(now())
-  currentPeriodEnd     DateTime?          // Null for Lifetime, +365 days for Yearly
-  cancelAtPeriodEnd    Boolean            @default(false)
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
-}
-
-model MediaItem {
-  id           String    @id @default(cuid())
-  title        String
-  type         MediaType
-  description  String?
-  thumbnailUrl String?
-  previewUrl   String    // Public 30s audio sample or 15s video teaser
-  fullMediaUrl String    // Secure streaming source (signed URL only)
-  durationSec  Int
-  sortOrder    Int       @default(0)
-  createdAt    DateTime  @default(now())
-}
-
-model PageAnalytics {
-  id        String   @id @default(cuid())
-  path      String   @unique @default("/")
-  viewCount BigInt   @default(0)
-  updatedAt DateTime @updatedAt
+export interface UserSubscription {
+  tier: SubscriptionTier
+  email: string | null
+  activeUntil: string | null
+  autoRenew: boolean
+  purchasedItemIds?: string[]
 }
 ```
 
 ---
 
-## 8. API & Route Specifications
+## 5. Summary Matrix of User Actions
 
-### 8.1 API Endpoints
-
-1. **`POST /api/checkout/create-session`**
-   - **Input**: `{ tier: "YEARLY" | "LIFETIME", email?: string }`
-   - **Action**: Generates a Stripe Checkout Session or PaymentIntent configured for Apple Pay & Google Pay.
-   - **Output**: `{ clientSecret: string, sessionId: string }`
-
-2. **`POST /api/webhooks/stripe`**
-   - **Action**: Validates Stripe webhook signatures.
-   - **Events handled**:
-     - `checkout.session.completed`: Creates user and subscription record.
-     - `customer.subscription.updated`: Updates renewal dates or flags cancellation status.
-     - `customer.subscription.deleted`: Revokes access when yearly subscription period terminates.
-
-3. **`GET /api/media/stream/[mediaId]`**
-   - **Action**: Authenticates incoming session.
-   - **Validation**: Checks if caller has active `YEARLY` or `LIFETIME` subscription.
-   - **Output**: Generates short-lived signed streaming URL or chunks media directly; 403 Forbidden for unauthorized callers.
-
-4. **`POST /api/subscription/cancel`**
-   - **Action**: Sets `cancelAtPeriodEnd = true` in Stripe. Access remains valid until the current 365-day cycle finishes.
-
-5. **`GET /api/analytics/views` & `POST /api/analytics/increment`**
-   - **Action**: Increments and fetches the live view counter displayed on the guns.lol hero section.
-
----
-
-## 9. Implementation Roadmap & Phases
-
-### Phase 1: Front-Page Hero & Aesthetics (guns.lol style)
-- [x] Configure Next.js layout with dark minimalist styling.
-- [ ] Build responsive hero with looping background video and audio toggle button.
-- [ ] Implement artist identity block, status indicator, and social link bar.
-- [ ] Integrate view counter component with Google Analytics 4 script.
-
-### Phase 2: Media Showcase & Previews
-- [ ] Build audio player component with 30-second waveform teaser playback.
-- [ ] Build video teaser component with blurred locked states.
-- [ ] Create floating "Unlock Full Access" sticky bottom bar.
-
-### Phase 3: Single-Page Patreon Checkout Modal
-- [ ] Install and configure shadcn/ui Dialog / Drawer components.
-- [ ] Present Yearly vs. Lifetime tier selector with transparent pricing.
-- [ ] Integrate Stripe Elements with Apple Pay and Google Pay support via Payment Request API.
-
-### Phase 4: Frictionless Webhook & Auto-Registration
-- [ ] Implement `/api/webhooks/stripe` to handle automated user and subscription creation.
-- [ ] Implement passwordless magic link email delivery for returning customer logins.
-- [ ] Ensure automatic session initiation upon successful biometric payment.
-
-### Phase 5: Gated Member Player & Subscription Management
-- [ ] Build authenticated member dashboard / player where unlocked songs and full videos play.
-- [ ] Build self-service subscription management (view expiry date, cancel yearly renewal).
-- [ ] Secure streaming endpoints with token validation.
-
----
-
-## 10. Required Credentials & Configuration Checklist
-
-To make the system live, the following API keys and accesses must be provided:
-- [ ] **Stripe Account**: Secret Key, Publishable Key, Webhook Secret.
-- [ ] **Apple Pay Merchant Domain Verification**: Hosted `.well-known/apple-developer-merchantid-domain-association`.
-- [ ] **Google Pay**: Verified in Stripe Dashboard (enabled by default with HTTPS).
-- [ ] **Google Analytics**: GA4 Measurement ID (`G-XXXXXXXXXX`).
-- [ ] **Database**: PostgreSQL connection URI (e.g. Supabase, Neon, or Railway).
-- [ ] **Email Provider**: Resend or SendGrid API Key for transactional magic links.
-- [ ] **Media Assets**: Hero background video file, creator songs (.mp3/.wav), and videos (.mp4).
+| Action Target | Current State | Triggered Flow | Resulting UI Response |
+| :--- | :--- | :--- | :--- |
+| **Song Item Card** | Locked | Click "Buy $29" | Opens `SubscriptionModal` with $29 Song Purchase scheme. |
+| **Song Item Card** | Unlocked | Click "Stream" | Loads song into `AudioPlayerBar` and begins playback. |
+| **Video Item Card** | Locked | Click "Subscribe" | Opens `SubscriptionModal` with Yearly ($29/yr) vs Lifetime ($79) scheme. |
+| **Video Item Card** | Unlocked | Click "Watch" | Opens `VideoModal` popup with 4K video player. |
+| **Top-Left Sound Button**| Muted / Active | Click Button | Toggles background video audio on/off immediately. |
+| **Sign In / Member Pill** | Signed Out / In | Click Pill | Opens `MemberStatusModal` showing active plan & Auto-Renewal: Enabled. |
+| **Payment Button** | Checkout Pending| Click Apple / Google Pay| Completes simulated payment, adds item ID to `purchasedItemIds`, unlocks card. |
