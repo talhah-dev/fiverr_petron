@@ -94,7 +94,7 @@ export function SubscriptionModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="p-3 sm:p-3.5 my-2 rounded-lg border border-white/10 bg-white/5 backdrop-blur-md space-y-2">
+        <div className="p-3 sm:p-3.5 my-2 rounded-lg border border-white/15 bg-transparent space-y-2">
           <div className="flex items-center justify-between gap-2 min-w-0">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
               <Badge
@@ -136,10 +136,10 @@ export function SubscriptionModal({
             <button
               type="button"
               onClick={() => setSelectedVideoTier("yearly")}
-              className={`p-2.5 sm:p-3 rounded-lg border text-left transition-all cursor-pointer backdrop-blur-md ${
+              className={`p-2.5 sm:p-3 rounded-lg border text-left transition-all cursor-pointer ${
                 selectedVideoTier === "yearly"
-                  ? "border-white/40 bg-white/15 text-white ring-1 ring-white/30 shadow-xs"
-                  : "border-white/10 bg-white/5 text-white/70 hover:border-white/25 hover:text-white hover:bg-white/10"
+                  ? "border-white/50 bg-white/10 text-white ring-1 ring-white/30 shadow-xs"
+                  : "border-white/20 bg-transparent text-white/70 hover:border-white/40 hover:text-white hover:bg-white/5"
               }`}
             >
               <div className="flex items-center justify-between">
@@ -148,7 +148,7 @@ export function SubscriptionModal({
                 </span>
                 <Badge
                   variant={selectedVideoTier === "yearly" ? "default" : "outline"}
-                  className="text-[9px] sm:text-[10px] py-0 px-1 h-4 bg-white/20 text-white border-white/20"
+                  className="text-[9px] sm:text-[10px] py-0 px-1 h-4 bg-transparent text-white border-white/25"
                 >
                   Annual
                 </Badge>
@@ -165,10 +165,10 @@ export function SubscriptionModal({
             <button
               type="button"
               onClick={() => setSelectedVideoTier("lifetime")}
-              className={`p-2.5 sm:p-3 rounded-lg border text-left transition-all cursor-pointer backdrop-blur-md ${
+              className={`p-2.5 sm:p-3 rounded-lg border text-left transition-all cursor-pointer ${
                 selectedVideoTier === "lifetime"
-                  ? "border-white/40 bg-white/15 text-white ring-1 ring-white/30 shadow-xs"
-                  : "border-white/10 bg-white/5 text-white/70 hover:border-white/25 hover:text-white hover:bg-white/10"
+                  ? "border-white/50 bg-white/10 text-white ring-1 ring-white/30 shadow-xs"
+                  : "border-white/20 bg-transparent text-white/70 hover:border-white/40 hover:text-white hover:bg-white/5"
               }`}
             >
               <div className="flex items-center justify-between">
@@ -177,7 +177,7 @@ export function SubscriptionModal({
                 </span>
                 <Badge
                   variant={selectedVideoTier === "lifetime" ? "default" : "secondary"}
-                  className="text-[9px] sm:text-[10px] py-0 px-1 h-4 bg-white/20 text-white border-white/20"
+                  className="text-[9px] sm:text-[10px] py-0 px-1 h-4 bg-transparent text-white border-white/25"
                 >
                   VIP
                 </Badge>
@@ -217,7 +217,7 @@ export function SubscriptionModal({
             size="lg"
             disabled={isProcessing}
             onClick={() => handleSimulatePayment("apple")}
-            className="w-full h-10 sm:h-11 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-2 rounded-lg backdrop-blur-md cursor-pointer transition-all shadow-xs"
+            className="w-full h-10 sm:h-11 bg-transparent hover:bg-white/10 border border-white/30 hover:border-white/50 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all shadow-xs"
           >
             {isProcessing && activePaymentMethod === "apple" ? (
               <>
@@ -238,7 +238,7 @@ export function SubscriptionModal({
             size="lg"
             disabled={isProcessing}
             onClick={() => handleSimulatePayment("google")}
-            className="w-full h-10 sm:h-11 bg-white/5 hover:bg-white/15 border border-white/20 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-2 rounded-lg backdrop-blur-md cursor-pointer transition-all shadow-xs"
+            className="w-full h-10 sm:h-11 bg-transparent hover:bg-white/10 border border-white/30 hover:border-white/50 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all shadow-xs"
           >
             {isProcessing && activePaymentMethod === "google" ? (
               <>

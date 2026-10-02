@@ -51,18 +51,18 @@ export function MediaCatalog({
           <h2 className="text-base font-semibold tracking-tight text-foreground">
             Vault
           </h2>
-          <Badge variant="secondary" className="text-[11px] px-1.5 py-0 h-4 font-mono">
+          <Badge variant="outline" className="text-[11px] px-1.5 py-0 h-4 font-mono bg-transparent border-white/20 text-white/80">
             {audioCount} Audios • {videoCount} Videos
           </Badge>
         </div>
 
-        <div className="grid grid-cols-3 p-1 bg-black/40 backdrop-blur-md rounded-lg border border-white/10 text-xs w-full sm:w-auto sm:inline-flex">
+        <div className="grid grid-cols-3 p-1 bg-transparent rounded-lg border border-white/15 text-xs w-full sm:w-auto sm:inline-flex gap-1">
           <button
             onClick={() => setFilter("all")}
             className={`py-1.5 px-3 rounded-md transition-all text-center whitespace-nowrap cursor-pointer text-xs ${
               filter === "all"
-                ? "bg-white/15 text-white shadow-xs font-medium backdrop-blur-sm border border-white/20"
-                : "text-white/70 hover:text-white hover:bg-white/5 border border-transparent"
+                ? "bg-white/15 text-white shadow-xs font-medium border border-white/30"
+                : "text-white/70 hover:text-white hover:bg-white/5 border border-transparent bg-transparent"
             }`}
           >
             All ({items.length})
@@ -71,8 +71,8 @@ export function MediaCatalog({
             onClick={() => setFilter("song")}
             className={`py-1.5 px-3 rounded-md transition-all text-center whitespace-nowrap cursor-pointer text-xs ${
               filter === "song"
-                ? "bg-white/15 text-white shadow-xs font-medium backdrop-blur-sm border border-white/20"
-                : "text-white/70 hover:text-white hover:bg-white/5 border border-transparent"
+                ? "bg-white/15 text-white shadow-xs font-medium border border-white/30"
+                : "text-white/70 hover:text-white hover:bg-white/5 border border-transparent bg-transparent"
             }`}
           >
             Audio ({audioCount})
@@ -81,8 +81,8 @@ export function MediaCatalog({
             onClick={() => setFilter("video")}
             className={`py-1.5 px-3 rounded-md transition-all text-center whitespace-nowrap cursor-pointer text-xs ${
               filter === "video"
-                ? "bg-white/15 text-white shadow-xs font-medium backdrop-blur-sm border border-white/20"
-                : "text-white/70 hover:text-white hover:bg-white/5 border border-transparent"
+                ? "bg-white/15 text-white shadow-xs font-medium border border-white/30"
+                : "text-white/70 hover:text-white hover:bg-white/5 border border-transparent bg-transparent"
             }`}
           >
             Videos ({videoCount})
@@ -101,7 +101,7 @@ export function MediaCatalog({
           return (
             <Card
               key={item.id}
-              className="bg-black/40 hover:bg-black/55 backdrop-blur-md border-white/10 hover:border-white/20 transition-all shadow-none"
+              className="bg-transparent hover:bg-white/[0.05] border-white/15 hover:border-white/30 transition-all shadow-none"
             >
               <CardContent className="p-2 sm:p-3 flex items-center justify-between gap-2 sm:gap-3">
                 <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
@@ -110,7 +110,7 @@ export function MediaCatalog({
                   </span>
 
                   {isAudio ? (
-                    <div className="relative size-10 sm:size-11 rounded-md bg-white/5 shrink-0 border border-white/10 flex items-center justify-center group overflow-hidden">
+                    <div className="relative size-10 sm:size-11 rounded-md bg-transparent shrink-0 border border-white/20 flex items-center justify-center group overflow-hidden">
                       <div className="flex flex-col items-center justify-center size-full group-hover:scale-105 transition-transform">
                         <Music className="size-4 text-foreground/80" />
                         <span className="text-[7px] font-mono text-muted-foreground font-semibold uppercase leading-tight mt-0.5">
@@ -218,7 +218,7 @@ export function MediaCatalog({
                           onWatchVideo(item)
                         }
                       }}
-                      className="text-xs gap-1 h-7.5 sm:h-8 px-2.5 sm:px-3 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 backdrop-blur-md cursor-pointer shrink-0 transition-all"
+                      className="text-xs gap-1 h-7.5 sm:h-8 px-2.5 sm:px-3 text-emerald-400 bg-transparent hover:bg-emerald-500/10 border border-emerald-400/40 hover:border-emerald-400/70 cursor-pointer shrink-0 transition-all"
                     >
                       {isAudio ? (
                         <>
@@ -236,7 +236,7 @@ export function MediaCatalog({
                     <Button
                       onClick={() => onOpenPayment(item)}
                       size="sm"
-                      className="bg-white/10 hover:bg-white/20 border border-white/25 text-white font-medium h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-md gap-1 cursor-pointer backdrop-blur-md shadow-xs text-xs shrink-0 whitespace-nowrap transition-all"
+                      className="bg-transparent hover:bg-white/10 border border-white/30 hover:border-white/50 text-white font-medium h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-md gap-1 cursor-pointer text-xs shrink-0 whitespace-nowrap transition-all"
                     >
                       <ShoppingCart className="size-3" />
                       <span className="hidden xs:inline">Buy </span>
@@ -246,7 +246,7 @@ export function MediaCatalog({
                     <Button
                       onClick={() => onOpenPayment(item)}
                       size="sm"
-                      className="bg-white/10 hover:bg-white/20 border border-white/25 text-white font-medium h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-md gap-1 cursor-pointer backdrop-blur-md shadow-xs text-xs shrink-0 whitespace-nowrap transition-all"
+                      className="bg-transparent hover:bg-white/10 border border-white/30 hover:border-white/50 text-white font-medium h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-md gap-1 cursor-pointer text-xs shrink-0 whitespace-nowrap transition-all"
                     >
                       <Sparkles className="size-3" />
                       <span>Subscribe</span>

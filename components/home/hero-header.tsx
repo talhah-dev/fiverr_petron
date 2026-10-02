@@ -54,7 +54,7 @@ export function HeroHeader({
           size="icon"
           onClick={onToggleMute}
           aria-label={isMuted ? "Unmute video sound" : "Mute video sound"}
-          className="size-8.5 rounded-full cursor-pointer bg-black/40 hover:bg-black/60 border-white/20 text-white backdrop-blur-md shadow-xs flex items-center justify-center transition-all"
+          className="size-8.5 rounded-full cursor-pointer bg-transparent hover:bg-white/10 border border-white/25 text-white shadow-xs flex items-center justify-center transition-all"
         >
           {isMuted ? (
             <VolumeX className="size-3.5 text-white/80" />
@@ -69,7 +69,7 @@ export function HeroHeader({
               variant="outline"
               size="sm"
               onClick={onOpenMemberModal}
-              className="gap-1.5 cursor-pointer text-xs rounded-full bg-black/40 hover:bg-black/60 border-white/20 text-white backdrop-blur-md shadow-xs"
+              className="gap-1.5 cursor-pointer text-xs rounded-full bg-transparent hover:bg-white/10 border border-white/25 text-white shadow-xs"
             >
               <CheckCircle2 className="size-3 text-emerald-400" />
               <span className="capitalize">{subscription.tier} Member</span>
@@ -79,7 +79,7 @@ export function HeroHeader({
               variant="outline"
               size="sm"
               onClick={onOpenMemberModal}
-              className="gap-1.5 cursor-pointer text-xs rounded-full bg-black/40 hover:bg-black/60 border-white/20 text-white backdrop-blur-md shadow-xs"
+              className="gap-1.5 cursor-pointer text-xs rounded-full bg-transparent hover:bg-white/10 border border-white/25 text-white shadow-xs"
             >
               <User className="size-3.5 text-white/80" />
               <span>Sign In</span>
@@ -97,8 +97,8 @@ export function HeroHeader({
               swagsxn
             </h1>
             <Badge
-              variant="secondary"
-              className="text-[10px] py-0 px-1.5 h-4 bg-white/20 text-white border-none backdrop-blur-sm"
+              variant="outline"
+              className="text-[10px] py-0 px-1.5 h-4 bg-transparent text-white border-white/25"
             >
               PRO
             </Badge>
@@ -109,7 +109,7 @@ export function HeroHeader({
           <Link
             href="mailto:contact@swagsxn.art"
             aria-label="Email"
-            className="p-2.5 rounded-full bg-black/40 hover:bg-black/60 border border-white/15 text-white/90 hover:text-white transition-all backdrop-blur-md"
+            className="p-2.5 rounded-full bg-transparent hover:bg-white/10 border border-white/20 text-white/90 hover:text-white transition-all"
           >
             <FaEnvelope className="size-4" />
           </Link>
@@ -118,7 +118,7 @@ export function HeroHeader({
             target="_blank"
             rel="noreferrer"
             aria-label="YouTube"
-            className="p-2.5 rounded-full bg-black/40 hover:bg-black/60 border border-white/15 text-white/90 hover:text-white transition-all backdrop-blur-md"
+            className="p-2.5 rounded-full bg-transparent hover:bg-white/10 border border-white/20 text-white/90 hover:text-white transition-all"
           >
             <FaYoutube className="size-4" />
           </Link>
@@ -127,7 +127,7 @@ export function HeroHeader({
             target="_blank"
             rel="noreferrer"
             aria-label="Instagram"
-            className="p-2.5 rounded-full bg-black/40 hover:bg-black/60 border border-white/15 text-white/90 hover:text-white transition-all backdrop-blur-md"
+            className="p-2.5 rounded-full bg-transparent hover:bg-white/10 border border-white/20 text-white/90 hover:text-white transition-all"
           >
             <FaInstagram className="size-4" />
           </Link>
@@ -136,7 +136,7 @@ export function HeroHeader({
             target="_blank"
             rel="noreferrer"
             aria-label="TikTok"
-            className="p-2.5 rounded-full bg-black/40 hover:bg-black/60 border border-white/15 text-white/90 hover:text-white transition-all backdrop-blur-md"
+            className="p-2.5 rounded-full bg-transparent hover:bg-white/10 border border-white/20 text-white/90 hover:text-white transition-all"
           >
             <FaTiktok className="size-4" />
           </Link>
@@ -145,13 +145,13 @@ export function HeroHeader({
             target="_blank"
             rel="noreferrer"
             aria-label="Spotify"
-            className="p-2.5 rounded-full bg-black/40 hover:bg-black/60 border border-white/15 text-white/90 hover:text-white transition-all backdrop-blur-md"
+            className="p-2.5 rounded-full bg-transparent hover:bg-white/10 border border-white/20 text-white/90 hover:text-white transition-all"
           >
             <FaSpotify className="size-4" />
           </Link>
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs text-white/80 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/15 drop-shadow-sm">
+        <div className="flex items-center gap-1.5 text-xs text-white/90 bg-transparent px-3 py-1 rounded-full border border-white/20">
           <Eye className="size-3.5" />
           <span className="font-mono">{viewCount.toLocaleString()}</span>
           <span>views</span>

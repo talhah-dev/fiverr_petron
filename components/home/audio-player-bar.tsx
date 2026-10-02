@@ -41,13 +41,13 @@ export function AudioPlayerBar({
 
   return (
     <div className="fixed bottom-4 inset-x-0 mx-auto max-w-xl px-4 z-40 animate-in fade-in slide-in-from-bottom-3 duration-200">
-      <div className="bg-black/55 backdrop-blur-xl border border-white/15 rounded-xl p-3 shadow-2xl flex items-center justify-between gap-3">
+      <div className="bg-black/60 backdrop-blur-2xl border border-white/20 rounded-xl p-3 shadow-2xl flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <Button
             variant="default"
             size="icon"
             onClick={onTogglePlay}
-            className="size-9 rounded-full shrink-0 bg-white/15 hover:bg-white/25 text-white border border-white/20 backdrop-blur-md cursor-pointer transition-all shadow-xs"
+            className="size-9 rounded-full shrink-0 bg-transparent hover:bg-white/15 text-white border border-white/30 cursor-pointer transition-all shadow-xs"
             aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? (
@@ -96,7 +96,7 @@ export function AudioPlayerBar({
               variant="outline"
               size="sm"
               onClick={onOpenSubscription}
-              className="text-xs h-7 gap-1 bg-white/10 hover:bg-white/20 border border-white/25 text-white backdrop-blur-md cursor-pointer transition-all"
+              className="text-xs h-7 gap-1 bg-transparent hover:bg-white/15 border border-white/30 text-white cursor-pointer transition-all"
             >
               <Lock className="size-3" />
               <span>{item.type === "song" ? "Buy $29" : "Subscribe"}</span>
